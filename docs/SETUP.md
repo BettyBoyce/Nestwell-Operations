@@ -31,6 +31,13 @@ cp .env.example .env.local   # paste the same values
 npm run dev
 ```
 
+## Database updates
+When a new file appears in `supabase/migrations/`, run it once in **Supabase → SQL Editor** (paste it all, then click **Run**). Every file is safe to run again.
+- `0001_crew.sql`: the base setup
+- `0002_required_photos.sql`: required completion photos, with several photos per job
+
+You can check what's installed at `/api/health`.
+
 ## Troubleshooting
 - **"No profile found":** the login exists but sign-up didn't finish. Delete the user in Supabase → Authentication → Users and sign up again.
 - **Photo upload fails:** check that step 1.2 ran, since it creates the `proof` storage bucket.

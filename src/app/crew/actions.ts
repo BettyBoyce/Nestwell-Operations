@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireParent, requireProfile, KID_EMAIL_DOMAIN } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+const MAX_PHOTOS = 6;
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const fail = (path: string, msg: string): never => redirect(`${path}?error=${encodeURIComponent(msg)}`);
 const done = (path = "/crew") => revalidatePath(path, "layout");
@@ -33,17 +34,34 @@ export async function clockOut() {
 
 export async function submitJob(jobId: string, formData: FormData) {
   const { supabase, profile } = await requireProfile();
-  let proofPath: string | null = null;
-  const file = formData.get("proof");
-  if (file instanceof File && file.size > 0) {
-    if (file.size > 10 * 1024 * 1024) fail("/crew", "Photo is too big (10 MB max).");
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-    proofPath = `${profile.family_id}/${jobId}/${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("proof").upload(proofPath, file, { contentType: file.type });
-    if (upErr) fail("/crew", `Photo upload failed: ${upErr.message}`);
+  const files = formData
+    .getAll("proof")
+    .filter((f): f is File => f instanceof File && f.size > 0)
+    .slice(0, MAX_PHOTOS);
+
+  const paths: string[] = [];
+  const stamp = Date.now();
+  for (const [i, file] of files.entries()) {
+    if (file.size > 4 * 1024 * 1024) fail("/crew", "A photo is too big. Try taking it again.");
+    const ext = file.type === "image/png" ? "png" : "jpg";
+    const path = `${profile.family_id}/${jobId}/${stamp}-${i + 1}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("proof").upload(path, file, { contentType: file.type || "image/jpeg" });
+    if (upErr) {
+      if (paths.length) await supabase.storage.from("proof").remove(paths);
+      fail("/crew", `Photo upload failed: ${upErr.message}`);
+    }
+    paths.push(path);
   }
-  const { error } = await supabase.rpc("submit_job", { p_job: jobId, p_proof: proofPath });
-  if (error) fail("/crew", error.message);
+
+  let { error } = await supabase.rpc("submit_job", { p_job: jobId, p_proofs: paths });
+  if (error && /could not find the function/i.test(error.message)) {
+    // Database not yet updated with 0002_required_photos.sql — use the original single-photo version.
+    ({ error } = await supabase.rpc("submit_job", { p_job: jobId, p_proof: paths[0] ?? null }));
+  }
+  if (error) {
+    if (paths.length) await supabase.storage.from("proof").remove(paths);
+    fail("/crew", error.message);
+  }
   done();
 }
 
@@ -62,7 +80,7 @@ export async function createJob(formData: FormData) {
   if (!title) fail("/crew", "Give the job a title.");
   if (!Number.isFinite(pay) || pay < 0) fail("/crew", "Enter a valid pay amount.");
   const assigned = str(formData, "assigned_to");
-  const { error } = await supabase.from("jobs").insert({
+  const row = {
     family_id: profile.family_id,
     title,
     description: str(formData, "description") || null,
@@ -72,8 +90,16 @@ export async function createJob(formData: FormData) {
     assigned_to: assigned || null,
     status: assigned ? "claimed" : "open",
     due_date: str(formData, "due_date") || null,
+    photo_required: !formData.get("photo_optional"),
     created_by: profile.id,
-  });
+  };
+  let { error } = await supabase.from("jobs").insert(row);
+  if (error && /photo_required/.test(error.message)) {
+    // Database not yet updated with 0002_required_photos.sql
+    const { photo_required: _skip, ...rest } = row;
+    void _skip;
+    ({ error } = await supabase.from("jobs").insert(rest));
+  }
   if (error) fail("/crew", error.message);
   done();
 }

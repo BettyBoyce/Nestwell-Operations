@@ -11,6 +11,8 @@ export type Job = {
   status: "open" | "claimed" | "submitted" | "approved";
   due_date: string | null;
   proof_path: string | null;
+  proof_paths: string[] | null;
+  photo_required: boolean | null;
   parent_note: string | null;
   earned_amount: number | null;
   submitted_at: string | null;

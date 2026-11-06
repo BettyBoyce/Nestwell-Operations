@@ -13,6 +13,7 @@ export async function GET() {
     database_tables: false,
     photo_bucket: false,
     crew_functions: false,
+    required_photos_update: false,
     signup_open: process.env.ALLOW_SIGNUP !== "false",
   };
   const notes: string[] = [];
@@ -30,6 +31,9 @@ export async function GET() {
     const { error: fnErr } = await admin.rpc("claim_job", { p_job: "00000000-0000-0000-0000-000000000000" });
     checks.crew_functions = !fnErr || !/could not find|does not exist/i.test(fnErr.message);
     if (!checks.crew_functions && fnErr) notes.push(`crew_functions: ${fnErr.message}`);
+    const { error: colErr } = await admin.from("jobs").select("photo_required, proof_paths").limit(1);
+    checks.required_photos_update = !colErr;
+    if (colErr) notes.push("required_photos_update: run supabase/migrations/0002_required_photos.sql");
   }
 
   const ready =

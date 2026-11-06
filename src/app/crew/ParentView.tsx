@@ -17,7 +17,7 @@ export function ParentView({
   jobs: Job[];
   time: TimeEntry[];
   payouts: Payout[];
-  proofUrls: Record<string, string>;
+  proofUrls: Record<string, string[]>;
 }) {
   const kids = members.filter((m) => m.role === "kid");
   const nameOf = (id: string | null) => members.find((m) => m.id === id)?.display_name ?? "Unassigned";
@@ -64,10 +64,21 @@ export function ParentView({
             <p className="text-sm">
               <span className="font-semibold">{nameOf(j.assigned_to)}</span> · {hoursForJob(time, j.id).toFixed(2)} hrs logged
             </p>
-            {proofUrls[j.id] && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <a href={proofUrls[j.id]} target="_blank"><img src={proofUrls[j.id]} alt="Proof photo" className="max-h-56 rounded-xl border" /></a>
+            {proofUrls[j.id]?.length ? (
+              <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {proofUrls[j.id].map((url, i) => (
+                  <li key={url}>
+                    <a href={url} target="_blank" rel="noreferrer">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt={`Work photo ${i + 1}`} className="aspect-square w-full rounded-xl border object-cover" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="rounded-xl bg-stone-100 px-3 py-2 text-sm text-stone-500">No photos submitted.</p>
             )}
+            <p className="text-xs text-stone-500">Tap a photo to see it full size.</p>
             <div className="flex flex-wrap items-end gap-2">
               <form action={approveJob.bind(null, j.id)}>
                 <SubmitButton pendingText="Approving…">Approve</SubmitButton>
@@ -122,6 +133,10 @@ export function ParentView({
             <label className="label" htmlFor="due_date">Due date</label>
             <input id="due_date" name="due_date" type="date" className="input" />
           </div>
+          <label className="flex items-center gap-2 text-sm text-stone-600 sm:col-span-2">
+            <input type="checkbox" name="photo_optional" className="h-4 w-4 accent-brand" />
+            No photo needed for this job <span className="text-xs text-stone-400">(photos are required by default)</span>
+          </label>
           <div className="sm:col-span-2">
             <SubmitButton className="btn w-full" pendingText="Posting…">Post job & notify</SubmitButton>
           </div>

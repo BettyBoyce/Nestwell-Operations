@@ -10,14 +10,20 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
   const { supabase, profile, familyName, members, jobs, time, payouts, notifications } = await loadCrew();
   const isParent = profile.role === "parent";
 
-  let proofUrls: Record<string, string> = {};
+  const proofUrls: Record<string, string[]> = {};
   if (isParent) {
-    const withProof = jobs.filter((j) => j.status === "submitted" && j.proof_path);
-    if (withProof.length) {
-      const { data } = await supabase.storage.from("proof").createSignedUrls(withProof.map((j) => j.proof_path!), 3600);
-      proofUrls = Object.fromEntries(
-        withProof.map((j, i) => [j.id, data?.[i]?.signedUrl]).filter(([, url]) => url) as [string, string][],
-      );
+    const pairs = jobs
+      .filter((j) => j.status === "submitted")
+      .flatMap((j) => {
+        const paths = j.proof_paths?.length ? j.proof_paths : j.proof_path ? [j.proof_path] : [];
+        return paths.map((p) => ({ jobId: j.id, path: p }));
+      });
+    if (pairs.length) {
+      const { data } = await supabase.storage.from("proof").createSignedUrls(pairs.map((p) => p.path), 3600);
+      pairs.forEach((p, i) => {
+        const url = data?.[i]?.signedUrl;
+        if (url) (proofUrls[p.jobId] ??= []).push(url);
+      });
     }
   }
 

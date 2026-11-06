@@ -1,4 +1,5 @@
 import { LiveTimer } from "@/components/LiveTimer";
+import { PhotoSubmit } from "@/components/PhotoSubmit";
 import { SubmitButton } from "@/components/SubmitButton";
 import { money } from "@/lib/auth";
 import { claimJob, clockIn, clockOut, submitJob } from "./actions";
@@ -53,6 +54,9 @@ export function KidView({
               {j.parent_note && (
                 <p className="rounded-xl bg-rust/10 px-3 py-2 text-sm text-rust">Parent note: {j.parent_note}</p>
               )}
+              <ol className="flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-bronze">
+                <li>① Clock in</li><li>② Do the work</li><li>③ Take photos</li><li>④ Send for review</li>
+              </ol>
               <p className="text-xs text-stone-500">Time logged: {hoursForJob(time, j.id).toFixed(2)} hrs</p>
               <div className="flex flex-wrap gap-2">
                 {running ? (
@@ -61,11 +65,7 @@ export function KidView({
                   <form action={clockIn.bind(null, j.id)}><SubmitButton className="btn-ghost">Clock in</SubmitButton></form>
                 )}
               </div>
-              <form action={submitJob.bind(null, j.id)} className="space-y-2 border-t border-stone-100 pt-3">
-                <label className="label" htmlFor={`proof-${j.id}`}>Proof photo (optional)</label>
-                <input id={`proof-${j.id}`} name="proof" type="file" accept="image/*" capture="environment" className="block w-full text-sm" />
-                <SubmitButton className="btn w-full" pendingText="Sending…">Mark done & send for review</SubmitButton>
-              </form>
+              <PhotoSubmit action={submitJob.bind(null, j.id)} required={j.photo_required !== false} />
             </li>
           );
         })}
@@ -80,6 +80,9 @@ export function KidView({
       )}
 
       <Section title="Extra jobs — earn more" empty="No extra jobs posted yet." count={extra.length}>
+        {extra.length > 0 && (
+          <li className="text-xs text-stone-500">Tap <b>Claim</b> and the job moves to <b>My jobs</b>, where you clock in, take photos and send it for review.</li>
+        )}
         {extra.map((j) => (
           <li key={j.id} className="card flex items-start justify-between gap-3">
             <JobHeader job={j} />
@@ -129,6 +132,7 @@ export function JobHeader({ job }: { job: Job }) {
         <p className="font-semibold">{job.title}</p>
         <span className="pill bg-gold/20 text-brand-dark">{payLabel(job)}</span>
         <span className="pill bg-brand-soft text-brand">{job.category}</span>
+        {job.photo_required !== false && <span className="pill bg-copper/15 text-copper">📸 Photo required</span>}
       </div>
       {job.description && <p className="mt-1 text-sm text-stone-600">{job.description}</p>}
       {job.due_date && <p className="mt-1 text-xs text-stone-500">Due {new Date(job.due_date + "T00:00").toLocaleDateString()}</p>}
