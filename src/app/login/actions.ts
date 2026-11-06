@@ -32,7 +32,7 @@ export async function signup(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   if (!familyName || !name || !email) back("/signup", "Please fill in every field.");
-  if (password.length < 8) back("/signup", "Password must be at least 8 characters.");
+  if (password.length < 6) back("/signup", "Password must be at least 6 characters (numbers are fine).");
 
   const admin = createAdminClient();
   const { data: created, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });

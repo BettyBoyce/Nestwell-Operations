@@ -122,7 +122,7 @@ export async function addKid(formData: FormData) {
   const password = str(formData, "password");
   if (!name) fail("/crew/team", "Enter the kid's name.");
   if (!/^[a-z0-9._-]{3,30}$/.test(username)) fail("/crew/team", "Username: 3–30 letters, numbers, dots or dashes.");
-  if (password.length < 6) fail("/crew/team", "Password must be at least 6 characters.");
+  if (password.length < 6) fail("/crew/team", "Password must be at least 6 characters (numbers are fine).");
 
   const admin = createAdminClient();
   const { data, error } = await admin.auth.admin.createUser({

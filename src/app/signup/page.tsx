@@ -19,8 +19,8 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
           <input className="input" id="email" name="email" type="email" autoComplete="email" required />
         </div>
         <div>
-          <label className="label" htmlFor="password">Password (8+ characters)</label>
-          <input className="input" id="password" name="password" type="password" minLength={8} autoComplete="new-password" required />
+          <label className="label" htmlFor="password">Password (6+ characters — numbers OK)</label>
+          <input className="input" id="password" name="password" type="password" minLength={6} autoComplete="new-password" required />
         </div>
         <button className="btn w-full">Create family</button>
       </form>

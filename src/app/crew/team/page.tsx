@@ -58,7 +58,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
               <input id="username" name="username" className="input" autoCapitalize="none" placeholder="sam.boyce" required />
             </div>
             <div>
-              <label className="label" htmlFor="password">Password (6+)</label>
+              <label className="label" htmlFor="password">Password (6+ — numbers OK)</label>
               <input id="password" name="password" type="text" minLength={6} className="input" required />
             </div>
             <div className="sm:col-span-2"><SubmitButton className="btn w-full">Add to crew</SubmitButton></div>
