@@ -25,6 +25,7 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
     <>
       <CrewHeader familyName={familyName} name={profile.display_name} isParent={isParent} notifications={notifications} />
       <main className="mx-auto max-w-3xl px-4 py-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-bronze">{familyName}</p>
         <h1 className="mb-4 text-3xl text-brand">Hi, {profile.display_name.split(" ")[0]} 👋</h1>
         {error && <p className="mb-4 rounded-xl bg-rust/10 px-3 py-2 text-sm text-rust">{error}</p>}
         {isParent ? (
