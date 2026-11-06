@@ -1,4 +1,4 @@
-# Nest Well Stays LLC — Crew Positions
+# Nestwell Stays LLC — Crew Positions
 
 Official position descriptions for the family crew. Each role describes the work, authority and performance expectations, and links the Crew app to real job responsibilities.
 

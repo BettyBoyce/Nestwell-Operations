@@ -1,4 +1,4 @@
-# Nest Well Stays LLC — Official Position Description
+# Nestwell Stays LLC — Official Position Description
 
 | | |
 |---|---|
@@ -8,13 +8,13 @@
 | **Position Holder** | Maxine Boyce |
 
 ## Position Summary
-The Property Cleaning & Guest Experience Assistant is responsible for supporting the cleanliness, organization, presentation, and overall resident experience of Nest Well Stays' mid-term rental portfolio.
+The Property Cleaning & Guest Experience Assistant is responsible for supporting the cleanliness, organization, presentation, and overall resident experience of Nestwell Stays' mid-term rental portfolio.
 
 The position primarily focuses on routine property cleaning, restocking household and guest supplies, and maintaining the company's standards for clean, comfortable, and well-equipped rental accommodations.
 
 Additional responsibilities may include assisting with unit turnovers, conducting property inspections, organizing and tracking supply inventory, uploading financial documentation, and providing feedback and recommendations to improve the guest experience.
 
-This role directly contributes to property readiness, operational efficiency, resident satisfaction, and the consistent delivery of the Nest Well Stays hospitality standard.
+This role directly contributes to property readiness, operational efficiency, resident satisfaction, and the consistent delivery of the Nestwell Stays hospitality standard.
 
 ## Primary Duties & Responsibilities
 
@@ -34,7 +34,7 @@ This role directly contributes to property readiness, operational efficiency, re
 - Ensure supplies are neatly organized, appropriately presented, and accessible to residents.
 - Identify low-stock items and communicate replenishment needs to management.
 - Assist with preparing welcome supplies and other guest amenities as directed.
-- Maintain consistency in supply presentation across Nest Well Stays properties.
+- Maintain consistency in supply presentation across Nestwell Stays properties.
 - Help minimize unnecessary waste and overstocking through responsible supply management.
 
 ## Secondary & As-Assigned Responsibilities
@@ -80,7 +80,7 @@ This role directly contributes to property readiness, operational efficiency, re
 - Assist with evaluating welcome supplies, household essentials, and other hospitality offerings.
 - Recommend improvements to furniture arrangements, storage solutions, and the usability of rental spaces.
 - Participate in discussions regarding guest feedback and potential property enhancements.
-- Support the development and refinement of Nest Well Stays' hospitality and property presentation standards.
+- Support the development and refinement of Nestwell Stays' hospitality and property presentation standards.
 - Communicate observations and recommendations to management for consideration and approval.
 
 ## Authority & Accountability
@@ -106,6 +106,6 @@ Successful performance in this position is demonstrated through:
 - **Communication & Accountability:** Completes assigned responsibilities reliably and communicates concerns, progress, and recommendations to management.
 
 ## Overall Position Objective
-To support the operational success of Nest Well Stays LLC by maintaining clean, organized, well-stocked, and welcoming rental properties while contributing to efficient property turnovers, inventory management, quality assurance, and continuous improvements to the resident experience.
+To support the operational success of Nestwell Stays LLC by maintaining clean, organized, well-stocked, and welcoming rental properties while contributing to efficient property turnovers, inventory management, quality assurance, and continuous improvements to the resident experience.
 
 Through dependable execution of assigned responsibilities and thoughtful attention to hospitality standards, this position helps protect property value, strengthen resident satisfaction, and support the company's commitment to providing comfortable, high-quality mid-term rental accommodations.

@@ -1,4 +1,4 @@
-# Nest Well Stays LLC — Official Position Description
+# Nestwell Stays LLC — Official Position Description
 
 | | |
 |---|---|
@@ -8,7 +8,7 @@
 | **Position Holder** | Landon Boyce |
 
 ## Position Summary
-The Property Maintenance & Operations Assistant is responsible for supporting the routine upkeep, cleanliness, and operational readiness of Nest Well Stays' mid-term rental portfolio.
+The Property Maintenance & Operations Assistant is responsible for supporting the routine upkeep, cleanliness, and operational readiness of Nestwell Stays' mid-term rental portfolio.
 
 The position primarily focuses on waste management, recycling services, lawn mowing, and landscape trimming to ensure rental properties maintain a clean, attractive, and well-maintained appearance.
 

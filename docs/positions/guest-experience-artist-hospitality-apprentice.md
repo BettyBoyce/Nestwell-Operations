@@ -1,4 +1,4 @@
-# Nest Well Stays LLC — Official Position Description
+# Nestwell Stays LLC — Official Position Description
 
 | | |
 |---|---|
@@ -8,7 +8,7 @@
 | **Position Holder** | Renlee Boyce |
 
 ## Position Summary
-The Guest Experience Artist & Hospitality Apprentice supports Nest Well Stays LLC by contributing original artwork, personalized guest welcome materials, and creative ideas that enhance the comfort and hospitality experience across the company's mid-term rental portfolio.
+The Guest Experience Artist & Hospitality Apprentice supports Nestwell Stays LLC by contributing original artwork, personalized guest welcome materials, and creative ideas that enhance the comfort and hospitality experience across the company's mid-term rental portfolio.
 
 The position primarily focuses on creating handmade welcome cards for incoming residents, producing original artwork for display within rental properties, and helping select thoughtful snacks and welcome amenities.
 
@@ -20,7 +20,7 @@ This role encourages creativity, responsibility, attention to detail, and an und
 
 ### 1. Guest Welcome Cards & Personalized Artwork
 - Design, draw, paint, or decorate handmade welcome cards for incoming rental guests.
-- Create original artwork that reflects the welcoming and thoughtful hospitality standards of Nest Well Stays.
+- Create original artwork that reflects the welcoming and thoughtful hospitality standards of Nestwell Stays.
 - Prepare welcome cards in advance of scheduled guest arrivals.
 - Maintain a consistent standard of care, creativity, and presentation in completed cards.
 - Assist with placing completed welcome cards in designated locations within rental units.
@@ -28,7 +28,7 @@ This role encourages creativity, responsibility, attention to detail, and an und
 - Explore new creative designs and seasonal themes appropriate for guest welcome materials.
 
 ### 2. Original Artwork & Property Decor
-- Create original drawings, paintings, and other age-appropriate artwork for display within Nest Well Stays rental properties.
+- Create original drawings, paintings, and other age-appropriate artwork for display within Nestwell Stays rental properties.
 - Contribute creative ideas for artwork that complements the style, atmosphere, and personality of individual rental units.
 - Assist with selecting appropriate artwork for designated property spaces.
 - Help prepare completed artwork for framing or display under management supervision.
@@ -60,7 +60,7 @@ This role encourages creativity, responsibility, attention to detail, and an und
 - Participate in age-appropriate discussions about hospitality and guest satisfaction.
 - Assist with testing the comfort and usability of approved household items and guest amenities.
 - Help identify small details that could make a guest's stay more enjoyable.
-- Learn how thoughtful hospitality and personalized touches contribute to the Nest Well Stays brand.
+- Learn how thoughtful hospitality and personalized touches contribute to the Nestwell Stays brand.
 
 ### 6. Hospitality & Business Education
 - Learn foundational concepts of operating a mid-term rental business.
@@ -92,8 +92,8 @@ Successful performance in this position is demonstrated through:
 - **Safety & Teamwork:** Follows instructions, works cooperatively, and participates safely in supervised activities.
 
 ## Overall Position Objective
-To enhance the Nest Well Stays guest experience through original artwork, personalized welcome cards, thoughtful hospitality touches, and creative contributions to rental property presentation.
+To enhance the Nestwell Stays guest experience through original artwork, personalized welcome cards, thoughtful hospitality touches, and creative contributions to rental property presentation.
 
 As a Hospitality Apprentice, this position also provides an opportunity to develop foundational business skills, responsibility, and an understanding of rental property operations through supervised, age-appropriate learning and participation.
 
-The role supports Nest Well Stays LLC's commitment to creating comfortable, memorable, and welcoming accommodations that feel like a home rather than simply a place to stay.
+The role supports Nestwell Stays LLC's commitment to creating comfortable, memorable, and welcoming accommodations that feel like a home rather than simply a place to stay.

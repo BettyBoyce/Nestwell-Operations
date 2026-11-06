@@ -1,4 +1,4 @@
-# Nest Well Stays LLC — Official Position Description
+# Nestwell Stays LLC — Official Position Description
 
 | | |
 |---|---|
@@ -8,7 +8,7 @@
 | **Position Holder** | Brandon Boyce |
 
 ## Position Summary
-The Maintenance & Finance Lead is responsible for overseeing the physical maintenance, repair coordination, and financial administration of Nest Well Stays' mid-term rental portfolio. This position ensures that properties remain safe, functional, well-maintained, and ready for occupancy while maintaining timely financial obligations and accurate reporting to the company's bookkeeper.
+The Maintenance & Finance Lead is responsible for overseeing the physical maintenance, repair coordination, and financial administration of Nestwell Stays' mid-term rental portfolio. This position ensures that properties remain safe, functional, well-maintained, and ready for occupancy while maintaining timely financial obligations and accurate reporting to the company's bookkeeper.
 
 The role combines hands-on property maintenance with contractor oversight and financial management to protect company assets, control operating expenses, and support a positive resident experience.
 
@@ -72,4 +72,4 @@ Successful performance in this position is demonstrated through:
 - **Communication:** Ownership remains informed of significant maintenance issues, financial concerns, and anticipated expenditures.
 
 ## Overall Position Objective
-To protect the physical and financial health of Nest Well Stays' rental portfolio through dependable maintenance, effective contractor management, timely bill payment, and organized financial administration—supporting profitable operations and a consistent, high-quality resident experience.
+To protect the physical and financial health of Nestwell Stays' rental portfolio through dependable maintenance, effective contractor management, timely bill payment, and organized financial administration—supporting profitable operations and a consistent, high-quality resident experience.
