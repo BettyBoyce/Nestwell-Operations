@@ -1,16 +1,17 @@
 -- Nestwell Operations · Crew (family jobs, time tracking, earnings)
--- Run in Supabase: SQL Editor → paste → Run. Safe to run once on a fresh project.
+-- Run in Supabase: SQL Editor → paste ALL of this → Run.
+-- Safe to run again: it skips or replaces anything that already exists.
 
 create extension if not exists pgcrypto;
 
 -- ───────────── Tables ─────────────
-create table public.families (
+create table if not exists public.families (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   created_at timestamptz not null default now()
 );
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users on delete cascade,
   family_id uuid not null references public.families on delete cascade,
   role text not null check (role in ('parent','kid')),
@@ -20,7 +21,7 @@ create table public.profiles (
   created_at timestamptz not null default now()
 );
 
-create table public.jobs (
+create table if not exists public.jobs (
   id uuid primary key default gen_random_uuid(),
   family_id uuid not null references public.families on delete cascade,
   title text not null,
@@ -40,9 +41,9 @@ create table public.jobs (
   created_by uuid references public.profiles on delete set null,
   created_at timestamptz not null default now()
 );
-create index on public.jobs (family_id, status);
+create index if not exists jobs_family_status_idx on public.jobs (family_id, status);
 
-create table public.time_entries (
+create table if not exists public.time_entries (
   id uuid primary key default gen_random_uuid(),
   family_id uuid not null references public.families on delete cascade,
   job_id uuid not null references public.jobs on delete cascade,
@@ -51,9 +52,9 @@ create table public.time_entries (
   ended_at timestamptz,
   check (ended_at is null or ended_at >= started_at)
 );
-create unique index one_open_timer_per_kid on public.time_entries (kid_id) where ended_at is null;
+create unique index if not exists one_open_timer_per_kid on public.time_entries (kid_id) where ended_at is null;
 
-create table public.payouts (
+create table if not exists public.payouts (
   id uuid primary key default gen_random_uuid(),
   family_id uuid not null references public.families on delete cascade,
   kid_id uuid not null references public.profiles on delete cascade,
@@ -64,7 +65,7 @@ create table public.payouts (
   created_by uuid references public.profiles on delete set null
 );
 
-create table public.notifications (
+create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   family_id uuid not null references public.families on delete cascade,
   user_id uuid not null references public.profiles on delete cascade,
@@ -72,7 +73,7 @@ create table public.notifications (
   read_at timestamptz,
   created_at timestamptz not null default now()
 );
-create index on public.notifications (user_id, read_at);
+create index if not exists notifications_user_read_idx on public.notifications (user_id, read_at);
 
 -- ───────────── Helpers ─────────────
 create or replace function public.my_family_id() returns uuid
@@ -107,6 +108,7 @@ begin
   end if;
   return new;
 end $$;
+drop trigger if exists job_created on public.jobs;
 create trigger job_created after insert on public.jobs
   for each row execute function public.on_job_created();
 
@@ -190,6 +192,7 @@ begin
   values (new.family_id, new.kid_id, 'Payday! $' || new.amount || ' paid' || coalesce(' via ' || new.method, ''));
   return new;
 end $$;
+drop trigger if exists payout_created on public.payouts;
 create trigger payout_created after insert on public.payouts
   for each row execute function public.record_payout();
 
@@ -201,36 +204,56 @@ alter table public.time_entries enable row level security;
 alter table public.payouts enable row level security;
 alter table public.notifications enable row level security;
 
+drop policy if exists "family read" on public.families;
 create policy "family read" on public.families for select using (id = my_family_id());
+drop policy if exists "parent update" on public.families;
 create policy "parent update" on public.families for update using (id = my_family_id() and is_parent());
 
+drop policy if exists "family read" on public.profiles;
 create policy "family read" on public.profiles for select using (family_id = my_family_id());
+drop policy if exists "parent update" on public.profiles;
 create policy "parent update" on public.profiles for update using (family_id = my_family_id() and is_parent());
 
+drop policy if exists "family read" on public.jobs;
 create policy "family read" on public.jobs for select using (family_id = my_family_id());
+drop policy if exists "parent insert" on public.jobs;
 create policy "parent insert" on public.jobs for insert with check (family_id = my_family_id() and is_parent());
+drop policy if exists "parent update" on public.jobs;
 create policy "parent update" on public.jobs for update using (family_id = my_family_id() and is_parent());
+drop policy if exists "parent delete" on public.jobs;
 create policy "parent delete" on public.jobs for delete using (family_id = my_family_id() and is_parent());
 
+drop policy if exists "read time" on public.time_entries;
 create policy "read time" on public.time_entries for select
   using (family_id = my_family_id() and (is_parent() or kid_id = auth.uid()));
+drop policy if exists "parent edit time" on public.time_entries;
 create policy "parent edit time" on public.time_entries for all
   using (family_id = my_family_id() and is_parent()) with check (family_id = my_family_id() and is_parent());
 
+drop policy if exists "read payouts" on public.payouts;
 create policy "read payouts" on public.payouts for select
   using (family_id = my_family_id() and (is_parent() or kid_id = auth.uid()));
+drop policy if exists "parent insert payouts" on public.payouts;
 create policy "parent insert payouts" on public.payouts for insert
   with check (family_id = my_family_id() and is_parent());
+drop policy if exists "parent delete payouts" on public.payouts;
 create policy "parent delete payouts" on public.payouts for delete
   using (family_id = my_family_id() and is_parent());
 
+drop policy if exists "own read" on public.notifications;
 create policy "own read" on public.notifications for select using (user_id = auth.uid());
+drop policy if exists "own mark read" on public.notifications;
 create policy "own mark read" on public.notifications for update using (user_id = auth.uid());
 
 -- ───────────── Storage: proof photos ─────────────
 insert into storage.buckets (id, name, public) values ('proof', 'proof', false)
   on conflict (id) do nothing;
+drop policy if exists "family upload proof" on storage.objects;
 create policy "family upload proof" on storage.objects for insert to authenticated
   with check (bucket_id = 'proof' and (storage.foldername(name))[1] = my_family_id()::text);
+drop policy if exists "family read proof" on storage.objects;
 create policy "family read proof" on storage.objects for select to authenticated
   using (bucket_id = 'proof' and (storage.foldername(name))[1] = my_family_id()::text);
+
+-- Refresh the API so the new functions are available immediately
+notify pgrst, 'reload schema';
