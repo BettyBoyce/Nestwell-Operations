@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nestwell Operations
 
-## Getting Started
+The operations hub for [Nestwell](https://www.staynestwell.com), a family-run business offering furnished mid-term rentals in Salem, including insurance housing. Every Nestwell tool is a product in this one repo.
 
-First, run the development server:
+## Products
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| Product | Status | What it does |
+|---|---|---|
+| **Crew** (`/crew`) | ✅ v0.1 | The kids work in the business: they get jobs, claim paid extra jobs, clock in and out, send proof photos and track their earnings. Parents approve work, record payouts and export records for the CPA. |
+| Turnover Checklists | Planned | Move-in and move-out checklists for each property, with photo proof |
+| Inventory & Restock | Planned | Linen and supply counts that build the shopping list |
+| Guest Welcome Kits | Planned | Welcome kits for traveling nurses and insurance-housing families |
+
+See [docs/ROADMAP.md](docs/ROADMAP.md) for what's next.
+
+## How Crew works
+
+```
+Parent posts job ──► kid notified ──► kid claims / clocks in ──► kid marks done + photo
+        ▲                                                              │
+        └──── payout recorded ◄── kid notified "Approved! +$" ◄── parent approves
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Assigned jobs** go to one kid. **Extra jobs** are open to every kid, and the first to claim one gets it.
+- **Pay** is either a flat amount or hourly. Hourly pay is calculated from the time clock when the job is approved.
+- **Balances:** owed = approved earnings − payouts recorded. You pay outside the app (Venmo, Greenlight, cash, payroll) and then log the payout.
+- **Records:** `/crew/export?year=2026` downloads a CSV of each approved job (date, hours, rate, amount) and each payout. This is the paperwork for wages paid to your kids.
+- **Security:** kids can only act through checks that run in the database. They can't approve their own work or edit amounts, and each family sees only its own data.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 15** (App Router, server actions) and **Tailwind 4**, styled with Nestwell's brand: forest green `#2F4E3D`, gold `#D4A017`, bronze `#8F6D43`, DM Serif Display and DM Sans
+- **Supabase**: Postgres, auth, row-level security and photo storage. The schema is in `supabase/migrations/`.
+- **Vercel** hosting. The app can be installed on phones from the browser (add it to the home screen).
 
-## Learn More
+## Getting started
 
-To learn more about Next.js, take a look at the following resources:
+Full step-by-step setup: **[docs/SETUP.md](docs/SETUP.md)**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+cp .env.example .env.local   # fill in Supabase keys
+npm run dev                  # http://localhost:3000
+```
