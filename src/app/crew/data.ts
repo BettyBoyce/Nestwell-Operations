@@ -59,6 +59,8 @@ export const JOB_CATEGORIES = [
   "General",
 ];
 
+export const PAY_METHODS = ["Venmo", "Check", "Cash", "Payroll"];
+
 export const DAY_NAMES = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]; // ISO 1–7
 
 export async function loadCrew() {

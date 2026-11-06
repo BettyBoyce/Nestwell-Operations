@@ -3,7 +3,7 @@ import { CrewHeader } from "@/components/CrewHeader";
 import { SubmitButton } from "@/components/SubmitButton";
 import { money, requireParent } from "@/lib/auth";
 import { addKid, recordPayout } from "../actions";
-import { kidTotals, loadCrew, scheduleLabel } from "../data";
+import { kidTotals, loadCrew, PAY_METHODS, scheduleLabel } from "../data";
 import { MemberSettings } from "./MemberSettings";
 
 export const dynamic = "force-dynamic";
@@ -88,7 +88,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
         {kids.length > 0 && (
           <section className="card">
             <h2 className="text-xl text-brand">Record a payout</h2>
-            <p className="text-sm text-stone-600">Pay outside the app (Venmo, Greenlight, cash, payroll), then log it here so balances and records stay right.</p>
+            <p className="text-sm text-stone-600">Pay outside the app (Venmo, check, cash or payroll), then log it here so balances and records stay right.</p>
             <form action={recordPayout} className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="label" htmlFor="kid_id">Crew member</label>
@@ -103,7 +103,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
               <div>
                 <label className="label" htmlFor="method">Method</label>
                 <select id="method" name="method" className="input">
-                  {["Venmo", "Greenlight", "Cash", "Bank transfer", "Payroll", "Roth IRA deposit"].map((m) => <option key={m}>{m}</option>)}
+                  {PAY_METHODS.map((m) => <option key={m}>{m}</option>)}
                 </select>
               </div>
               <div>

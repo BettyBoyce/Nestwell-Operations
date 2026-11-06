@@ -9,6 +9,7 @@ import {
   isoDow,
   JOB_CATEGORIES,
   kidTotals,
+  PAY_METHODS,
   routineWeek,
   scheduleLabel,
   weekShifts,
@@ -95,7 +96,7 @@ export function ParentView({
                   {t.owed > 0 && (
                     <form action={payBalance.bind(null, k.id, t.owed, `Week of ${w.label}`)} className="flex gap-2">
                       <select name="method" className="input w-auto" aria-label="Payment method">
-                        {["Venmo", "Zelle", "Cash", "Check", "Bank transfer", "Payroll"].map((m) => <option key={m}>{m}</option>)}
+                        {PAY_METHODS.map((m) => <option key={m}>{m}</option>)}
                       </select>
                       <SubmitButton className="btn-gold flex-1" pendingText="Saving…">Mark {money(t.owed)} paid</SubmitButton>
                     </form>

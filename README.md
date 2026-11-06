@@ -23,7 +23,7 @@ Parent posts job ──► kid notified ──► kid claims / clocks in ──�
 
 - **Assigned jobs** go to one kid. **Extra jobs** are open to every kid, and the first to claim one gets it.
 - **Pay** is either a flat amount or hourly. Hourly pay is calculated from the time clock when the job is approved.
-- **Balances:** owed = approved earnings − payouts recorded. You pay outside the app (Venmo, Greenlight, cash, payroll) and then log the payout.
+- **Balances:** owed = approved earnings − payouts recorded. You pay outside the app (Venmo, check, cash or payroll) and then log the payout.
 - **Records:** `/crew/export?year=2026` downloads a CSV of each approved job (date, hours, rate, amount) and each payout. This is the paperwork for wages paid to your kids.
 - **Security:** kids can only act through checks that run in the database. They can't approve their own work or edit amounts, and each family sees only its own data.
 
