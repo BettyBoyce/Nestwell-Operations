@@ -51,7 +51,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
             </div>
             <div>
               <label className="label" htmlFor="birth_year">Birth year</label>
-              <input id="birth_year" name="birth_year" type="number" min="2000" max="2030" className="input" />
+              <input id="birth_year" name="birth_year" type="number" min="1920" max={new Date().getFullYear()} className="input" />
             </div>
             <div>
               <label className="label" htmlFor="username">Username (for login)</label>
