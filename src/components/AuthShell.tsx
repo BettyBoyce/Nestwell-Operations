@@ -13,8 +13,9 @@ export function AuthShell({
 }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-4 py-10">
-      <Link href="/" className="text-sm font-semibold uppercase tracking-widest text-brand">
-        Nestwell Operations
+      <Link href="/" aria-label="Nestwell Operations home">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/nestwell-logo.png" alt="Nestwell" className="h-10 w-auto" />
       </Link>
       <h1 className="mt-2 text-2xl font-bold">{title}</h1>
       <p className="mt-1 text-sm text-stone-600">{subtitle}</p>

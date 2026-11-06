@@ -10,6 +10,10 @@
   --color-rust: #753824;        /* alerts, "needs work" */
   --color-sand: #d9b79c;
   --color-cream: #f8f4ee;
+  /* From the Nestwell logo */
+  --color-copper: #b87333;      /* nest circle */
+  --color-charcoal: #2c3836;    /* wordmark */
+  --color-leaf: #006838;        /* leaf accent */
   --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "DM Serif Display", Georgia, serif;
 }

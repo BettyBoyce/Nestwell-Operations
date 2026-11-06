@@ -5,6 +5,13 @@ export const metadata: Metadata = {
   title: "Nestwell Operations",
   description: "Nestwell's family-run operations hub — jobs, time tracking and earnings for the crew.",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   appleWebApp: { capable: true, title: "Nestwell Crew", statusBarStyle: "default" },
 };
 

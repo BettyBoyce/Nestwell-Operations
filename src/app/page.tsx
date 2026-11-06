@@ -15,8 +15,9 @@ const products = [
 export default function Home() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <p className="text-sm font-semibold uppercase tracking-widest text-brand">Nestwell</p>
-      <h1 className="mt-1 text-3xl font-bold">Nestwell Operations</h1>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/nestwell-logo.png" alt="Nestwell" className="h-12 w-auto sm:h-14" />
+      <h1 className="mt-4 text-3xl">Operations</h1>
       <p className="mt-2 text-stone-600">The home base for running Nestwell — built by and for the family.</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">

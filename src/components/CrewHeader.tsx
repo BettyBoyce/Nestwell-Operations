@@ -18,9 +18,13 @@ export function CrewHeader({
   return (
     <header className="bg-brand text-white">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/crew" className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-sand">Nestwell Crew</p>
-          <p className="truncate font-serif text-lg leading-tight">{familyName}</p>
+        <Link href="/crew" className="flex min-w-0 items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/nest-mark.png" alt="" width={36} height={36} className="h-9 w-9 shrink-0" />
+          <span className="min-w-0">
+            <span className="block text-[11px] font-semibold uppercase tracking-widest text-sand">Nestwell Crew</span>
+            <span className="block truncate font-serif text-lg leading-tight">{familyName}</span>
+          </span>
         </Link>
         <div className="flex items-center gap-2 text-sm">
           {isParent && (
