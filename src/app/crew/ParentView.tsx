@@ -2,8 +2,24 @@ import Link from "next/link";
 import { LiveTimer } from "@/components/LiveTimer";
 import { SubmitButton } from "@/components/SubmitButton";
 import { money } from "@/lib/auth";
-import { approveJob, createJob, deleteJob, sendBackJob } from "./actions";
-import { hoursForJob, JOB_CATEGORIES, kidTotals, type Job, type Member, type Payout, type TimeEntry } from "./data";
+import { approveJob, createJob, deleteJob, payBalance, sendBackJob } from "./actions";
+import {
+  DAY_NAMES,
+  hoursForJob,
+  isoDow,
+  JOB_CATEGORIES,
+  kidTotals,
+  routineWeek,
+  scheduleLabel,
+  weekShifts,
+  type Job,
+  type Member,
+  type Payout,
+  type Routine,
+  type RoutineCheck,
+  type Shift,
+  type TimeEntry,
+} from "./data";
 import { JobHeader, Section } from "./KidView";
 
 export function ParentView({
@@ -12,13 +28,22 @@ export function ParentView({
   time,
   payouts,
   proofUrls,
+  shifts = [],
+  routines = [],
+  checks = [],
+  tz = "America/Los_Angeles",
 }: {
   members: Member[];
   jobs: Job[];
   time: TimeEntry[];
   payouts: Payout[];
   proofUrls: Record<string, string[]>;
+  shifts?: Shift[];
+  routines?: Routine[];
+  checks?: RoutineCheck[];
+  tz?: string;
 }) {
+  const rweek = routineWeek(tz);
   const kids = members.filter((m) => m.role === "kid");
   const nameOf = (id: string | null) => members.find((m) => m.id === id)?.display_name ?? "Unassigned";
   const review = jobs.filter((j) => j.status === "submitted");
@@ -37,15 +62,93 @@ export function ParentView({
       {kids.length > 0 && (
         <section className="grid gap-3 sm:grid-cols-2">
           {kids.map((k) => {
-            const t = kidTotals(k.id, jobs, time, payouts);
+            const t = kidTotals(k.id, jobs, time, payouts, shifts);
+            const header = (
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-serif text-lg leading-tight">{k.display_name}</p>
+                  {k.position_title && <p className="truncate text-xs text-stone-500">{k.position_title}</p>}
+                </div>
+                {(t.openShift || t.activeTimer) && (
+                  <span className="pill shrink-0 bg-gold/20 text-brand-dark">
+                    ⏱ <LiveTimer since={(t.openShift ?? t.activeTimer)!.started_at} />
+                  </span>
+                )}
+              </div>
+            );
+
+            if (k.pay_type === "hourly") {
+              const w = weekShifts(shifts, k.id, tz);
+              return (
+                <div key={k.id} className="card space-y-3">
+                  {header}
+                  <p className="text-xs text-bronze">
+                    Hourly · ${Number(k.hourly_rate ?? 0).toFixed(2)}/hr{scheduleLabel(k) ? ` · ${scheduleLabel(k)}` : ""}
+                  </p>
+                  <dl className="grid grid-cols-3 text-center text-sm">
+                    <div><dt className="text-[11px] uppercase text-bronze">This week</dt><dd className="font-bold">{w.hours.toFixed(2)} h</dd></div>
+                    <div><dt className="text-[11px] uppercase text-bronze">Week pay</dt><dd className="font-bold">{money(w.amount)}</dd></div>
+                    <div><dt className="text-[11px] uppercase text-bronze">Owed</dt><dd className="font-bold text-brand">{money(t.owed)}</dd></div>
+                  </dl>
+                  {t.owed > 0 && (
+                    <form action={payBalance.bind(null, k.id, t.owed, `Week of ${w.label}`)} className="flex gap-2">
+                      <select name="method" className="input w-auto" aria-label="Payment method">
+                        {["Venmo", "Zelle", "Cash", "Check", "Bank transfer", "Payroll"].map((m) => <option key={m}>{m}</option>)}
+                      </select>
+                      <SubmitButton className="btn-gold flex-1" pendingText="Saving…">Mark {money(t.owed)} paid</SubmitButton>
+                    </form>
+                  )}
+                  <Link href="/crew/team#timesheet" className="block text-center text-xs font-semibold text-brand">View / fix timesheet →</Link>
+                </div>
+              );
+            }
+
+            if (k.pay_type === "payroll") {
+              const mine = routines.filter((r) => r.kid_id === k.id);
+              const isDone = (r: Routine, d: string) => checks.some((c) => c.routine_id === r.id && c.check_date === d);
+              const workDays = rweek.days.filter((d) => mine.some((r) => r.days.includes(isoDow(d))));
+              const dueToday = mine.filter((r) => r.days.includes(isoDow(rweek.today)));
+              const doneToday = dueToday.filter((r) => isDone(r, rweek.today)).length;
+              return (
+                <div key={k.id} className="card space-y-3">
+                  {header}
+                  <p className="text-xs text-bronze">Payroll · daily routine</p>
+                  {mine.length === 0 ? (
+                    <p className="text-sm text-stone-500">No routine set. <Link className="font-semibold text-brand" href="/crew/team">Add one</Link></p>
+                  ) : (
+                    <>
+                      <p className={`text-sm font-semibold ${dueToday.length && doneToday === dueToday.length ? "text-brand" : "text-stone-600"}`}>
+                        Today: {dueToday.length === 0 ? "nothing scheduled" : doneToday === dueToday.length ? "all done ✓" : `${doneToday} of ${dueToday.length} done`}
+                      </p>
+                      <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${Math.max(workDays.length, 1)}, minmax(0, 1fr))` }}>
+                        {workDays.map((d) => {
+                          const due = mine.filter((r) => r.days.includes(isoDow(d)));
+                          const n = due.filter((r) => isDone(r, d)).length;
+                          const future = d > rweek.today;
+                          return (
+                            <div
+                              key={d}
+                              title={due.map((r) => `${isDone(r, d) ? "✓" : "✗"} ${r.title}`).join("\n")}
+                              className={`rounded-lg py-1 text-center text-[11px] ${d === rweek.today ? "ring-2 ring-gold" : ""} ${
+                                future ? "bg-stone-50 text-stone-400" : n === due.length ? "bg-brand text-white" : n ? "bg-gold/20" : "bg-rust/10 text-rust"
+                              }`}
+                            >
+                              <span className="block font-semibold">{DAY_NAMES[isoDow(d)]}</span>
+                              {future ? "·" : n === due.length ? "✓" : `${n}/${due.length}`}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                  {t.owed > 0 && <p className="text-xs text-stone-500">Extra jobs owed: <b className="text-brand">{money(t.owed)}</b></p>}
+                </div>
+              );
+            }
+
             return (
               <div key={k.id} className="card">
-                <div className="flex items-center justify-between">
-                  <p className="font-serif text-lg">{k.display_name}</p>
-                  {t.activeTimer && (
-                    <span className="pill bg-gold/20 text-brand-dark">⏱ <LiveTimer since={t.activeTimer.started_at} /></span>
-                  )}
-                </div>
+                {header}
                 <dl className="mt-2 grid grid-cols-3 text-center text-sm">
                   <div><dt className="text-[11px] uppercase text-bronze">Owed</dt><dd className="font-bold text-brand">{money(t.owed)}</dd></div>
                   <div><dt className="text-[11px] uppercase text-bronze">Earned</dt><dd className="font-bold">{money(t.earned)}</dd></div>

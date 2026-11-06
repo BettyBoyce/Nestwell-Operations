@@ -14,6 +14,7 @@ export async function GET() {
     photo_bucket: false,
     crew_functions: false,
     required_photos_update: false,
+    shifts_routines_update: false,
     signup_open: process.env.ALLOW_SIGNUP !== "false",
   };
   const notes: string[] = [];
@@ -34,6 +35,9 @@ export async function GET() {
     const { error: colErr } = await admin.from("jobs").select("photo_required, proof_paths").limit(1);
     checks.required_photos_update = !colErr;
     if (colErr) notes.push("required_photos_update: run supabase/migrations/0002_required_photos.sql");
+    const { error: srErr } = await admin.from("routines").select("id").limit(1);
+    checks.shifts_routines_update = !srErr;
+    if (srErr) notes.push("shifts_routines_update: run supabase/migrations/0003_pay_types_shifts_routines.sql");
   }
 
   const ready =

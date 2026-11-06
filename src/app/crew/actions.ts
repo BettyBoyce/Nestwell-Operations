@@ -173,3 +173,124 @@ export async function addKid(formData: FormData) {
   }
   done("/crew/team");
 }
+
+// ───────── Hourly shifts ─────────
+export async function shiftClockIn() {
+  const { supabase } = await requireProfile();
+  const { error } = await supabase.rpc("shift_clock_in");
+  if (error) fail("/crew", error.message);
+  done();
+}
+
+export async function shiftClockOut() {
+  const { supabase } = await requireProfile();
+  const { error } = await supabase.rpc("shift_clock_out");
+  if (error) fail("/crew", error.message);
+  done();
+}
+
+/** Parent fixes a shift. Times are entered in the family's local time. */
+export async function fixShift(shiftId: string, tz: string, formData: FormData) {
+  const { supabase } = await requireParent();
+  const date = str(formData, "date");
+  const start = str(formData, "start");
+  const end = str(formData, "end");
+  if (!date || !start) fail("/crew/team", "Enter a date and clock-in time.");
+  const toIso = (t: string) => zonedToIso(date, t, tz);
+  const { error } = await supabase.rpc("fix_shift", {
+    p_shift: shiftId,
+    p_start: toIso(start),
+    p_end: end ? toIso(end) : null,
+    p_note: str(formData, "note") || null,
+  });
+  if (error) fail("/crew/team", error.message);
+  done("/crew/team");
+}
+
+export async function deleteShift(shiftId: string) {
+  const { supabase } = await requireParent();
+  const { error } = await supabase.from("shifts").delete().eq("id", shiftId);
+  if (error) fail("/crew/team", error.message);
+  done("/crew/team");
+}
+
+/** Convert a local wall-clock date + time in `tz` to an ISO instant. */
+function zonedToIso(ymd: string, hhmm: string, tz: string) {
+  const guess = new Date(`${ymd}T${hhmm}:00Z`);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
+  }).formatToParts(guess);
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const asLocal = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"));
+  return new Date(guess.getTime() - (asLocal - guess.getTime())).toISOString();
+}
+
+// ───────── Routines ─────────
+export async function toggleRoutine(routineId: string, date: string) {
+  const { supabase } = await requireProfile();
+  const { error } = await supabase.rpc("toggle_routine", { p_routine: routineId, p_date: date });
+  if (error) fail("/crew", error.message);
+  done();
+}
+
+export async function addRoutine(kidId: string, formData: FormData) {
+  const { supabase, profile } = await requireParent();
+  const title = str(formData, "title");
+  if (!title) fail("/crew/team", "Enter the routine task.");
+  const days = formData.getAll("days").map(Number).filter((d) => d >= 1 && d <= 7);
+  const { error } = await supabase.from("routines").insert({
+    family_id: profile.family_id,
+    kid_id: kidId,
+    title,
+    days: days.length ? days : [1, 2, 3, 4, 5],
+    sort: Date.now() % 100000,
+  });
+  if (error) fail("/crew/team", error.message);
+  done("/crew/team");
+}
+
+export async function removeRoutine(routineId: string) {
+  const { supabase } = await requireParent();
+  // Keep history: deactivate instead of deleting.
+  const { error } = await supabase.from("routines").update({ active: false }).eq("id", routineId);
+  if (error) fail("/crew/team", error.message);
+  done("/crew/team");
+}
+
+// ───────── Pay setup per crew member ─────────
+export async function updatePaySetup(memberId: string, formData: FormData) {
+  const { supabase } = await requireParent();
+  const payType = str(formData, "pay_type");
+  if (!["per_job", "hourly", "payroll"].includes(payType)) fail("/crew/team", "Choose how this person is paid.");
+  const rate = str(formData, "hourly_rate");
+  if (payType === "hourly" && !(Number(rate) > 0)) fail("/crew/team", "Enter an hourly rate.");
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      pay_type: payType,
+      hourly_rate: rate ? Number(rate) : null,
+      work_days: formData.getAll("work_days").map(Number).filter((d) => d >= 1 && d <= 7),
+      shift_start: str(formData, "shift_start") || null,
+      shift_end: str(formData, "shift_end") || null,
+      position_title: str(formData, "position_title") || null,
+    })
+    .eq("id", memberId);
+  if (error) fail("/crew/team", error.message);
+  done("/crew/team");
+}
+
+/** One-tap "Mark paid" for an hourly crew member's balance. */
+export async function payBalance(kidId: string, amount: number, note: string, formData: FormData) {
+  const { supabase, profile } = await requireParent();
+  if (!(amount > 0)) fail("/crew", "Nothing owed right now.");
+  const { error } = await supabase.from("payouts").insert({
+    family_id: profile.family_id,
+    kid_id: kidId,
+    amount: Math.round(amount * 100) / 100,
+    method: str(formData, "method") || null,
+    note,
+    created_by: profile.id,
+  });
+  if (error) fail("/crew", error.message);
+  done();
+}

@@ -3,20 +3,45 @@ import { PhotoSubmit } from "@/components/PhotoSubmit";
 import { SubmitButton } from "@/components/SubmitButton";
 import { money } from "@/lib/auth";
 import { claimJob, clockIn, clockOut, submitJob } from "./actions";
-import { hoursForJob, kidTotals, payLabel, type Job, type Payout, type TimeEntry } from "./data";
+import {
+  hoursForJob,
+  kidTotals,
+  payLabel,
+  weekShifts,
+  type Job,
+  type Member,
+  type Payout,
+  type Routine,
+  type RoutineCheck,
+  type Shift,
+  type TimeEntry,
+} from "./data";
+import { RoutineCard } from "./RoutineCard";
+import { ShiftCard } from "./ShiftCard";
 
 export function KidView({
   me,
   jobs,
   time,
   payouts,
+  shifts = [],
+  routines = [],
+  checks = [],
+  tz = "America/Los_Angeles",
 }: {
-  me: { id: string; display_name: string };
+  me: Member;
   jobs: Job[];
   time: TimeEntry[];
   payouts: Payout[];
+  shifts?: Shift[];
+  routines?: Routine[];
+  checks?: RoutineCheck[];
+  tz?: string;
 }) {
-  const t = kidTotals(me.id, jobs, time, payouts);
+  const t = kidTotals(me.id, jobs, time, payouts, shifts);
+  const hourly = me.pay_type === "hourly";
+  const payroll = me.pay_type === "payroll";
+  const week = weekShifts(shifts, me.id, tz);
   const mine = jobs.filter((j) => j.assigned_to === me.id);
   const active = mine.filter((j) => j.status === "claimed");
   const waiting = mine.filter((j) => j.status === "submitted");
@@ -26,11 +51,32 @@ export function KidView({
 
   return (
     <div className="space-y-6">
-      <section className="grid grid-cols-3 gap-3">
-        <Stat label="Owed to you" value={money(t.owed)} highlight />
-        <Stat label="Earned total" value={money(t.earned)} />
-        <Stat label="Hours this month" value={t.hoursThisMonth.toFixed(1)} />
-      </section>
+      {hourly ? (
+        <>
+          <ShiftCard me={me} openShift={t.openShift} tz={tz} />
+          <section className="grid grid-cols-3 gap-3">
+            <Stat label="This week" value={money(week.amount)} highlight />
+            <Stat label="Hours this week" value={week.hours.toFixed(2)} />
+            <Stat label="Owed to you" value={money(t.owed)} />
+          </section>
+          <WeekShiftList week={week} tz={tz} />
+        </>
+      ) : payroll ? (
+        <RoutineCard me={me} routines={routines.filter((r) => r.kid_id === me.id)} checks={checks} tz={tz} />
+      ) : (
+        <section className="grid grid-cols-3 gap-3">
+          <Stat label="Owed to you" value={money(t.owed)} highlight />
+          <Stat label="Earned total" value={money(t.earned)} />
+          <Stat label="Hours this month" value={t.hoursThisMonth.toFixed(1)} />
+        </section>
+      )}
+
+      {payroll && (t.earned > 0 || mine.length > 0) && (
+        <section className="grid grid-cols-2 gap-3">
+          <Stat label="Extra jobs owed" value={money(t.owed)} highlight />
+          <Stat label="Extra jobs earned" value={money(t.earned)} />
+        </section>
+      )}
 
       {t.activeTimer && (
         <section className="card flex items-center justify-between gap-3 border-gold bg-gold/10">
@@ -45,7 +91,7 @@ export function KidView({
         </section>
       )}
 
-      <Section title="My jobs" empty="No jobs right now — check the extra jobs below!" count={active.length}>
+      <Section title="My jobs" empty={hourly || payroll ? "No extra jobs assigned right now." : "No jobs right now — check the extra jobs below!"} count={active.length}>
         {active.map((j) => {
           const running = t.activeTimer?.job_id === j.id;
           return (
@@ -137,5 +183,45 @@ export function JobHeader({ job }: { job: Job }) {
       {job.description && <p className="mt-1 text-sm text-stone-600">{job.description}</p>}
       {job.due_date && <p className="mt-1 text-xs text-stone-500">Due {new Date(job.due_date + "T00:00").toLocaleDateString()}</p>}
     </div>
+  );
+}
+
+function WeekShiftList({ week, tz }: { week: ReturnType<typeof weekShifts>; tz: string }) {
+  const fmt = (iso: string) => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: tz });
+  const day = (iso: string) => new Date(iso).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: tz });
+  return (
+    <section className="card">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-xl text-brand">This pay week</h2>
+        <span className="text-xs text-stone-500">{week.label} · paid Friday</span>
+      </div>
+      {week.list.length === 0 ? (
+        <p className="mt-2 text-sm text-stone-500">No shifts yet this week.</p>
+      ) : (
+        <ul className="mt-2 divide-y divide-stone-100 text-sm">
+          {week.list.map((s) => (
+            <li key={s.id} className="flex items-center justify-between py-2">
+              <span>
+                <span className="font-medium">{day(s.started_at)}</span>
+                <span className="block text-xs text-stone-500">
+                  {fmt(s.started_at)} – {s.ended_at ? fmt(s.ended_at) : "on the clock"}
+                  {s.note ? ` · ${s.note}` : ""}
+                </span>
+              </span>
+              <span className="text-right">
+                <span className="font-semibold">{s.ended_at ? money(s.amount) : "—"}</span>
+                <span className="block text-xs text-stone-500">
+                  {s.ended_at ? `${((new Date(s.ended_at).getTime() - new Date(s.started_at).getTime()) / 3_600_000).toFixed(2)} hrs` : ""}
+                </span>
+              </span>
+            </li>
+          ))}
+          <li className="flex justify-between pt-2 font-bold text-brand">
+            <span>Week total · {week.hours.toFixed(2)} hrs</span>
+            <span>{money(week.amount)}</span>
+          </li>
+        </ul>
+      )}
+    </section>
   );
 }

@@ -2,14 +2,15 @@ import { CrewHeader } from "@/components/CrewHeader";
 import { SubmitButton } from "@/components/SubmitButton";
 import { money, requireParent } from "@/lib/auth";
 import { addKid, recordPayout } from "../actions";
-import { kidTotals, loadCrew } from "../data";
+import { kidTotals, loadCrew, scheduleLabel } from "../data";
+import { MemberSettings } from "./MemberSettings";
 
 export const dynamic = "force-dynamic";
 
 export default async function TeamPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requireParent();
   const { error } = await searchParams;
-  const { profile, familyName, members, jobs, time, payouts, notifications } = await loadCrew();
+  const { profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines } = await loadCrew();
   const kids = members.filter((m) => m.role === "kid");
   const nameOf = (id: string) => members.find((m) => m.id === id)?.display_name ?? "—";
 
@@ -23,19 +24,36 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
         <section className="card">
           <h2 className="text-xl text-brand">The crew</h2>
           {kids.length === 0 && <p className="mt-2 text-sm text-stone-500">No crew members added yet.</p>}
+          <p className="mt-1 text-xs text-stone-500">Tap a person to set how they&apos;re paid, their schedule, routine or timesheet.</p>
           <ul className="mt-3 divide-y divide-stone-100">
             {kids.map((k) => {
-              const t = kidTotals(k.id, jobs, time, payouts);
+              const t = kidTotals(k.id, jobs, time, payouts, shifts);
+              const how =
+                k.pay_type === "hourly"
+                  ? `Hourly $${Number(k.hourly_rate ?? 0).toFixed(2)}${scheduleLabel(k) ? " · " + scheduleLabel(k) : ""}`
+                  : k.pay_type === "payroll"
+                    ? `Payroll · ${routines.filter((r) => r.kid_id === k.id).length} routine task(s)`
+                    : "Per job";
               return (
-                <li key={k.id} className="flex items-center justify-between py-2 text-sm">
-                  <div>
-                    <p className="font-semibold">{k.display_name}</p>
-                    <p className="text-xs text-stone-500">Login: <span className="font-mono">{k.username}</span></p>
-                  </div>
-                  <p className="text-right">
-                    <span className="font-bold text-brand">{money(t.owed)}</span>
-                    <span className="block text-xs text-stone-500">owed · {money(t.paid)} paid</span>
-                  </p>
+                <li key={k.id}>
+                  <details className="group py-2">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm [&::-webkit-details-marker]:hidden">
+                      <div className="min-w-0">
+                        <p className="font-semibold">
+                          {k.display_name} <span className="text-stone-400 group-open:hidden">›</span>
+                          <span className="hidden text-stone-400 group-open:inline">⌄</span>
+                        </p>
+                        <p className="truncate text-xs text-stone-500">
+                          <span className="font-mono">{k.username}</span> · {how}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-right">
+                        <span className="font-bold text-brand">{money(t.owed)}</span>
+                        <span className="block text-xs text-stone-500">owed · {money(t.paid)} paid</span>
+                      </p>
+                    </summary>
+                    <MemberSettings member={k} routines={routines.filter((r) => r.kid_id === k.id)} shifts={shifts} tz={timezone} />
+                  </details>
                 </li>
               );
             })}

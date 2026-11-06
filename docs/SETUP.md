@@ -35,6 +35,7 @@ npm run dev
 When a new file appears in `supabase/migrations/`, run it once in **Supabase → SQL Editor** (paste it all, then click **Run**). Every file is safe to run again.
 - `0001_crew.sql`: the base setup
 - `0002_required_photos.sql`: required completion photos, with several photos per job
+- `0003_pay_types_shifts_routines.sql`: pay types (per job, hourly, payroll), the shift clock, weekly pay and daily routines
 
 You can check what's installed at `/api/health`.
 
