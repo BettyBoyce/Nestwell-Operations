@@ -5,7 +5,7 @@ import { login } from "./actions";
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   return (
-    <AuthShell title="Welcome back, crew" subtitle="Parents use email. Kids use the username a parent gave you." error={error}>
+    <AuthShell title="Welcome back, crew" subtitle="Parents use email. Crew members use the username a parent gave you." error={error}>
       <form action={login} className="space-y-4">
         <div>
           <label className="label" htmlFor="login">Email or username</label>

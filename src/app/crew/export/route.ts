@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 
   const body = csv([
     [`${familyName} — Nestwell Crew records ${year}`],
-    ["type", "date", "kid", "job / note", "category / method", "description", "hours", "pay type", "rate", "amount"],
+    ["type", "date", "crew member", "job / note", "category / method", "description", "hours", "pay type", "rate", "amount"],
     ...work,
     ...paid,
   ]);

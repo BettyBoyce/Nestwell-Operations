@@ -22,7 +22,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
 
         <section className="card">
           <h2 className="text-xl text-brand">The crew</h2>
-          {kids.length === 0 && <p className="mt-2 text-sm text-stone-500">No kids added yet.</p>}
+          {kids.length === 0 && <p className="mt-2 text-sm text-stone-500">No crew members added yet.</p>}
           <ul className="mt-3 divide-y divide-stone-100">
             {kids.map((k) => {
               const t = kidTotals(k.id, jobs, time, payouts);
@@ -43,7 +43,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
         </section>
 
         <section className="card">
-          <h2 className="text-xl text-brand">Add a kid</h2>
+          <h2 className="text-xl text-brand">Add a crew member</h2>
           <form action={addKid} className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
               <label className="label" htmlFor="display_name">Name</label>
@@ -71,7 +71,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
             <p className="text-sm text-stone-600">Pay outside the app (Venmo, Greenlight, cash, payroll), then log it here so balances and records stay right.</p>
             <form action={recordPayout} className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="label" htmlFor="kid_id">Kid</label>
+                <label className="label" htmlFor="kid_id">Crew member</label>
                 <select id="kid_id" name="kid_id" className="input">
                   {kids.map((k) => <option key={k.id} value={k.id}>{k.display_name}</option>)}
                 </select>

@@ -4,7 +4,7 @@ import { signup } from "../login/actions";
 export default async function SignupPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   return (
-    <AuthShell title="Set up your family crew" subtitle="Create the parent account. You'll add the kids next." error={error}>
+    <AuthShell title="Set up your family crew" subtitle="Create the parent account. You'll add your crew members next." error={error}>
       <form action={signup} className="space-y-4">
         <div>
           <label className="label" htmlFor="family">Family / business name</label>

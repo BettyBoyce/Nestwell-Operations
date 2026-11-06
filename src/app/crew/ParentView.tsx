@@ -28,9 +28,9 @@ export function ParentView({
     <div className="space-y-6">
       {kids.length === 0 && (
         <div className="card border-gold bg-gold/10">
-          <p className="font-semibold">Start by adding your kids.</p>
-          <p className="text-sm text-stone-600">Each kid gets a username and password to log in on their phone.</p>
-          <Link href="/crew/team" className="btn mt-3">Add kids</Link>
+          <p className="font-semibold">Start by adding your crew.</p>
+          <p className="text-sm text-stone-600">Each crew member gets a username and password to log in on their phone.</p>
+          <Link href="/crew/team" className="btn mt-3">Add crew members</Link>
         </div>
       )}
 

@@ -120,7 +120,7 @@ export async function addKid(formData: FormData) {
   const name = str(formData, "display_name");
   const username = str(formData, "username").toLowerCase();
   const password = str(formData, "password");
-  if (!name) fail("/crew/team", "Enter the kid's name.");
+  if (!name) fail("/crew/team", "Enter the crew member's name.");
   if (!/^[a-z0-9._-]{3,30}$/.test(username)) fail("/crew/team", "Username: 3–30 letters, numbers, dots or dashes.");
   if (password.length < 6) fail("/crew/team", "Password must be at least 6 characters (numbers are fine).");
 
@@ -130,7 +130,7 @@ export async function addKid(formData: FormData) {
     password,
     email_confirm: true,
   });
-  if (error || !data.user) fail("/crew/team", error?.message.includes("already") ? "That username is taken." : error?.message ?? "Could not add kid.");
+  if (error || !data.user) fail("/crew/team", error?.message.includes("already") ? "That username is taken." : error?.message ?? "Could not add crew member.");
 
   const birthYear = Number(str(formData, "birth_year")) || null;
   const { error: pErr } = await admin.from("profiles").insert({
