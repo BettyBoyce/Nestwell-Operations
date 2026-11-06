@@ -5,7 +5,7 @@ Official position descriptions for the family crew. Each role describes the work
 | Crew member | Position | Department | Description |
 |---|---|---|---|
 | Brandon Boyce | Maintenance & Finance Lead | Property Operations & Finance | [maintenance-finance-lead.md](maintenance-finance-lead.md) |
-| Landon | _To be defined_ | | |
+| Landon Boyce | Property Maintenance & Operations Assistant | Property Operations | [property-maintenance-operations-assistant.md](property-maintenance-operations-assistant.md) ⚠️ end of Performance Expectations pending |
 | Maxine | _To be defined_ | | |
 | Renlee | _To be defined_ | | |
 
