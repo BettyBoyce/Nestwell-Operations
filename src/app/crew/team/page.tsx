@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CrewHeader } from "@/components/CrewHeader";
 import { SubmitButton } from "@/components/SubmitButton";
 import { money, requireParent } from "@/lib/auth";
@@ -52,6 +53,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
                         <span className="block text-xs text-stone-500">owed · {money(t.paid)} paid</span>
                       </p>
                     </summary>
+                    <Link href={`/crew/member/${k.id}`} className="btn-ghost mt-3 w-full">See {k.display_name.split(" ")[0]}&apos;s week →</Link>
                     <MemberSettings member={k} routines={routines.filter((r) => r.kid_id === k.id)} shifts={shifts} tz={timezone} />
                   </details>
                 </li>

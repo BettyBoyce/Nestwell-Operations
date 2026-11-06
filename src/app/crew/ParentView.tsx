@@ -65,10 +65,12 @@ export function ParentView({
             const t = kidTotals(k.id, jobs, time, payouts, shifts);
             const header = (
               <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-serif text-lg leading-tight">{k.display_name}</p>
+                <Link href={`/crew/member/${k.id}`} className="group min-w-0">
+                  <p className="font-serif text-lg leading-tight group-hover:underline">
+                    {k.display_name} <span className="font-sans text-sm text-stone-400">›</span>
+                  </p>
                   {k.position_title && <p className="truncate text-xs text-stone-500">{k.position_title}</p>}
-                </div>
+                </Link>
                 {(t.openShift || t.activeTimer) && (
                   <span className="pill shrink-0 bg-gold/20 text-brand-dark">
                     ⏱ <LiveTimer since={(t.openShift ?? t.activeTimer)!.started_at} />
@@ -98,7 +100,10 @@ export function ParentView({
                       <SubmitButton className="btn-gold flex-1" pendingText="Saving…">Mark {money(t.owed)} paid</SubmitButton>
                     </form>
                   )}
-                  <Link href="/crew/team#timesheet" className="block text-center text-xs font-semibold text-brand">View / fix timesheet →</Link>
+                  <div className="flex justify-between text-xs font-semibold text-brand">
+                    <Link href={`/crew/member/${k.id}`}>See this week →</Link>
+                    <Link href="/crew/team#timesheet">Fix timesheet →</Link>
+                  </div>
                 </div>
               );
             }
@@ -142,6 +147,7 @@ export function ParentView({
                     </>
                   )}
                   {t.owed > 0 && <p className="text-xs text-stone-500">Extra jobs owed: <b className="text-brand">{money(t.owed)}</b></p>}
+                  <Link href={`/crew/member/${k.id}`} className="block text-center text-xs font-semibold text-brand">See this week →</Link>
                 </div>
               );
             }
@@ -154,6 +160,7 @@ export function ParentView({
                   <div><dt className="text-[11px] uppercase text-bronze">Earned</dt><dd className="font-bold">{money(t.earned)}</dd></div>
                   <div><dt className="text-[11px] uppercase text-bronze">Hrs/mo</dt><dd className="font-bold">{t.hoursThisMonth.toFixed(1)}</dd></div>
                 </dl>
+                <div className="mt-3"><Link href={`/crew/member/${k.id}`} className="block text-center text-xs font-semibold text-brand">See this week →</Link></div>
               </div>
             );
           })}
