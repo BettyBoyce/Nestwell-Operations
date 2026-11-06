@@ -84,6 +84,28 @@ This role directly contributes to property readiness, operational efficiency, re
 - Communicate observations and recommendations to management for consideration and approval.
 
 ## Authority & Accountability
-The Property Cleaning & Guest Experience Assistant is authorized to independently complete…
+The Property Cleaning & Guest Experience Assistant is authorized to independently complete assigned routine cleaning, restocking, and supply organization duties in accordance with established company procedures.
 
-> ⚠️ **Incomplete:** the rest of Authority & Accountability, Performance Expectations and Overall Position Objective were cut off when submitted. To be added.
+Additional responsibilities, including unit turnovers, property inspections, bookkeeping documentation, and guest experience consulting, are performed as assigned by ownership or designated management.
+
+The position may provide recommendations regarding supplies, amenities, furnishings, and property improvements but does not independently authorize significant purchases, property modifications, or financial commitments.
+
+All work must be performed using appropriate safety procedures, approved equipment, and applicable supervision requirements.
+
+## Performance Expectations
+Successful performance in this position is demonstrated through:
+
+- **Cleaning Quality:** Assigned rental units and property areas consistently meet company cleanliness standards.
+- **Supply Readiness:** Essential household and guest supplies remain appropriately stocked, organized, and available.
+- **Turnover Efficiency:** Assigned turnover responsibilities are completed accurately and within established timeframes.
+- **Property Presentation:** Rental accommodations remain welcoming, orderly, and consistent with company hospitality standards.
+- **Inventory Management:** Supplies are organized, monitored, and used responsibly to minimize waste and unnecessary expenses.
+- **Inspection Accuracy:** Property concerns and deficiencies are identified, documented, and communicated promptly.
+- **Administrative Accuracy:** Assigned receipts and business documents are uploaded accurately and in a timely manner.
+- **Guest Experience Contribution:** Provides thoughtful, practical feedback that supports improvements in resident comfort and satisfaction.
+- **Communication & Accountability:** Completes assigned responsibilities reliably and communicates concerns, progress, and recommendations to management.
+
+## Overall Position Objective
+To support the operational success of Nest Well Stays LLC by maintaining clean, organized, well-stocked, and welcoming rental properties while contributing to efficient property turnovers, inventory management, quality assurance, and continuous improvements to the resident experience.
+
+Through dependable execution of assigned responsibilities and thoughtful attention to hospitality standards, this position helps protect property value, strengthen resident satisfaction, and support the company's commitment to providing comfortable, high-quality mid-term rental accommodations.
