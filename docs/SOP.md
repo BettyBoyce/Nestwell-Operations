@@ -174,7 +174,9 @@ Pay outside the app (**Venmo, Check, Cash or Payroll**), then **record it in the
 
 **Owed** = everything earned (approved jobs + completed shifts) − everything recorded as paid.
 
-> Payroll crew (Landon, Maxine, Renlee) are paid through payroll. The app records their routine check-offs as proof of work, not their payroll amounts. Only record a payout in the app for **extra jobs** they've been paid for.
+> **Payroll crew (Landon, Maxine, Renlee):** you can record their payroll payments with method **Payroll**. These are kept as a payroll record and **don't** reduce what they're owed for extra jobs. Extra-job payments should use Venmo, Check or Cash.
+>
+> **Owed** never shows below $0. If more has been recorded as paid than was earned, the card shows **"Paid ahead $___"** instead.
 
 ### 5.5 Fixing a shift (forgot to clock in or out, wrong time)
 1. **Team & Pay** → tap **Kyle** → scroll to **This pay week**.

@@ -40,7 +40,7 @@ export function KidView({
   tz?: string;
   selectedDay?: string;
 }) {
-  const t = kidTotals(me.id, jobs, time, payouts, shifts);
+  const t = kidTotals(me.id, jobs, time, payouts, shifts, me.pay_type);
   const hourly = me.pay_type === "hourly";
   const payroll = me.pay_type === "payroll";
   const week = weekShifts(shifts, me.id, tz);

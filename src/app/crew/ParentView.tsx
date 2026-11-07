@@ -63,7 +63,7 @@ export function ParentView({
       {kids.length > 0 && (
         <section className="grid gap-3 sm:grid-cols-2">
           {kids.map((k) => {
-            const t = kidTotals(k.id, jobs, time, payouts, shifts);
+            const t = kidTotals(k.id, jobs, time, payouts, shifts, k.pay_type);
             const header = (
               <div className="flex items-start justify-between gap-2">
                 <Link href={`/crew/member/${k.id}`} className="group min-w-0">
@@ -148,6 +148,7 @@ export function ParentView({
                     </>
                   )}
                   {t.owed > 0 && <p className="text-xs text-stone-500">Extra jobs owed: <b className="text-brand">{money(t.owed)}</b></p>}
+                  {t.payrollPaid > 0 && <p className="text-xs text-stone-500">Payroll recorded: {money(t.payrollPaid)}</p>}
                   <Link href={`/crew/member/${k.id}`} className="block text-center text-xs font-semibold text-brand">See this week →</Link>
                 </div>
               );
@@ -161,6 +162,9 @@ export function ParentView({
                   <div><dt className="text-[11px] uppercase text-bronze">Earned</dt><dd className="font-bold">{money(t.earned)}</dd></div>
                   <div><dt className="text-[11px] uppercase text-bronze">Hrs/mo</dt><dd className="font-bold">{t.hoursThisMonth.toFixed(1)}</dd></div>
                 </dl>
+                {t.paidAhead > 0 && (
+                  <p className="mt-2 text-center text-xs text-stone-500">Paid ahead {money(t.paidAhead)} (recorded payments exceed approved work)</p>
+                )}
                 <div className="mt-3"><Link href={`/crew/member/${k.id}`} className="block text-center text-xs font-semibold text-brand">See this week →</Link></div>
               </div>
             );

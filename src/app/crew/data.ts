@@ -178,14 +178,25 @@ export function hoursForJob(time: TimeEntry[], jobId: string) {
     .reduce((h, t) => h + ((t.ended_at ? new Date(t.ended_at).getTime() : Date.now()) - new Date(t.started_at).getTime()) / 3_600_000, 0);
 }
 
-export function kidTotals(kidId: string, jobs: Job[], time: TimeEntry[], payouts: Payout[], shifts: Shift[] = []) {
+export function kidTotals(
+  kidId: string,
+  jobs: Job[],
+  time: TimeEntry[],
+  payouts: Payout[],
+  shifts: Shift[] = [],
+  payType?: PayType | null,
+) {
   const jobEarned = jobs
     .filter((j) => j.assigned_to === kidId && j.status === "approved")
     .reduce((s, j) => s + Number(j.earned_amount ?? 0), 0);
   const mine = shifts.filter((s) => s.kid_id === kidId);
   const shiftEarned = mine.reduce((s, x) => s + Number(x.amount ?? 0), 0);
   const earned = jobEarned + shiftEarned;
-  const paid = payouts.filter((p) => p.kid_id === kidId).reduce((s, p) => s + Number(p.amount), 0);
+  // Payroll crew: "Payroll" payments are their regular payroll, tracked separately from job/shift balances.
+  const theirs = payouts.filter((p) => p.kid_id === kidId);
+  const isPayrollPay = (p: Payout) => payType === "payroll" && p.method === "Payroll";
+  const payrollPaid = theirs.filter(isPayrollPay).reduce((s, p) => s + Number(p.amount), 0);
+  const paid = theirs.filter((p) => !isPayrollPay(p)).reduce((s, p) => s + Number(p.amount), 0);
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
   const jobHours = time
     .filter((t) => t.kid_id === kidId && t.ended_at && new Date(t.started_at).getTime() >= monthStart)
@@ -195,7 +206,17 @@ export function kidTotals(kidId: string, jobs: Job[], time: TimeEntry[], payouts
     .reduce((h, s) => h + shiftHours(s), 0);
   const activeTimer = time.find((t) => t.kid_id === kidId && !t.ended_at) ?? null;
   const openShift = mine.find((s) => !s.ended_at) ?? null;
-  return { earned, paid, owed: earned - paid, hoursThisMonth: jobHours + shiftHoursMonth, activeTimer, openShift };
+  const balance = Math.round((earned - paid) * 100) / 100;
+  return {
+    earned,
+    paid,
+    payrollPaid,
+    owed: Math.max(0, balance), // never shown as negative
+    paidAhead: Math.max(0, -balance), // paid more than earned (e.g. payroll recorded before 0003 ran)
+    hoursThisMonth: jobHours + shiftHoursMonth,
+    activeTimer,
+    openShift,
+  };
 }
 
 export const payLabel = (j: Pick<Job, "pay_type" | "pay_amount">) =>
