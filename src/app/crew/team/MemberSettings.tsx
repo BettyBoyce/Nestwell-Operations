@@ -54,6 +54,11 @@ export function MemberSettings({
             <label className="label" htmlFor={`rate-${member.id}`}>Hourly rate $ (hourly only)</label>
             <input id={`rate-${member.id}`} name="hourly_rate" type="number" min="0" step="0.25" defaultValue={member.hourly_rate ?? ""} className="input" />
           </div>
+          <div>
+            <label className="label" htmlFor={`dr-${member.id}`}>Daily rate $ (payroll only)</label>
+            <input id={`dr-${member.id}`} name="daily_rate" type="number" min="0" step="0.01" defaultValue={member.daily_rate ?? ""} className="input" />
+            <p className="mt-1 text-[11px] text-stone-500">Earned each day all routine tasks are checked off. Monthly pay ÷ 20.</p>
+          </div>
           <div className="sm:col-span-2">
             <label className="label" htmlFor={`title-${member.id}`}>Position title</label>
             <input id={`title-${member.id}`} name="position_title" defaultValue={member.position_title ?? ""} className="input" placeholder="e.g. Maintenance & Finance Lead" />

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CrewPage({ searchParams }: { searchParams: Promise<{ error?: string; day?: string }> }) {
   const { error, day } = await searchParams;
-  const { supabase, profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, checks, pendingUpdates } =
+  const { supabase, profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, checks, routineDays, pendingUpdates } =
     await loadCrew();
   const isParent = profile.role === "parent";
 
@@ -48,6 +48,7 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
             shifts={shifts}
             routines={routines}
             checks={checks}
+            routineDays={routineDays}
             tz={timezone}
           />
         ) : (
@@ -59,6 +60,7 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
             shifts={shifts}
             routines={routines}
             checks={checks}
+            routineDays={routineDays}
             tz={timezone}
             selectedDay={day && /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : undefined}
           />

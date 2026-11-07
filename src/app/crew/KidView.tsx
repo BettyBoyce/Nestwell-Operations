@@ -5,7 +5,9 @@ import { money } from "@/lib/auth";
 import { claimJob, clockIn, clockOut, submitJob } from "./actions";
 import {
   hoursForJob,
+  isoDow,
   kidTotals,
+  localDate,
   payLabel,
   weekShifts,
   type Job,
@@ -13,6 +15,7 @@ import {
   type Payout,
   type Routine,
   type RoutineCheck,
+  type RoutineDay,
   type Shift,
   type TimeEntry,
 } from "./data";
@@ -27,6 +30,7 @@ export function KidView({
   shifts = [],
   routines = [],
   checks = [],
+  routineDays = [],
   tz = "America/Los_Angeles",
   selectedDay,
 }: {
@@ -37,13 +41,19 @@ export function KidView({
   shifts?: Shift[];
   routines?: Routine[];
   checks?: RoutineCheck[];
+  routineDays?: RoutineDay[];
   tz?: string;
   selectedDay?: string;
 }) {
-  const t = kidTotals(me.id, jobs, time, payouts, shifts, me.pay_type);
+  const t = kidTotals(me.id, jobs, time, payouts, shifts, routineDays);
   const hourly = me.pay_type === "hourly";
   const payroll = me.pay_type === "payroll";
   const week = weekShifts(shifts, me.id, tz);
+  const today = localDate(tz);
+  const myRoutines = routines.filter((r) => r.kid_id === me.id);
+  const dueToday = myRoutines.filter((r) => r.days.includes(isoDow(today)));
+  const routineLeft = dueToday.filter((r) => !checks.some((c) => c.routine_id === r.id && c.check_date === today)).length;
+  const mustFinishRoutine = routineLeft > 0;
   const mine = jobs.filter((j) => j.assigned_to === me.id);
   const active = mine.filter((j) => j.status === "claimed");
   const waiting = mine.filter((j) => j.status === "submitted");
@@ -64,7 +74,14 @@ export function KidView({
           <WeekShiftList week={week} tz={tz} />
         </>
       ) : payroll ? (
-        <RoutineCard me={me} routines={routines.filter((r) => r.kid_id === me.id)} checks={checks} tz={tz} selectedDay={selectedDay} />
+        <>
+          <RoutineCard me={me} routines={myRoutines} checks={checks} routineDays={routineDays} tz={tz} selectedDay={selectedDay} />
+          <section className="grid grid-cols-3 gap-3">
+            <Stat label="Earned this month" value={money(t.routineEarnedThisMonth)} highlight />
+            <Stat label="Days complete" value={String(t.routineDaysThisMonth)} />
+            <Stat label={t.paidAhead > 0 ? "Paid ahead" : "Owed to you"} value={money(t.paidAhead > 0 ? t.paidAhead : t.owed)} />
+          </section>
+        </>
       ) : (
         <section className="grid grid-cols-3 gap-3">
           <Stat label="Owed to you" value={money(t.owed)} highlight />
@@ -73,12 +90,6 @@ export function KidView({
         </section>
       )}
 
-      {payroll && (t.earned > 0 || mine.length > 0) && (
-        <section className="grid grid-cols-2 gap-3">
-          <Stat label="Extra jobs owed" value={money(t.owed)} highlight />
-          <Stat label="Extra jobs earned" value={money(t.earned)} />
-        </section>
-      )}
 
       {t.activeTimer && (
         <section className="card flex items-center justify-between gap-3 border-gold bg-gold/10">
@@ -128,15 +139,24 @@ export function KidView({
       )}
 
       <Section title="Extra jobs — earn more" empty="No extra jobs posted yet." count={extra.length}>
-        {extra.length > 0 && (
+        {extra.length > 0 && mustFinishRoutine && (
+          <li className="rounded-xl bg-gold/15 px-3 py-2 text-sm text-brand-dark">
+            🔒 Finish today&apos;s routine first ({routineLeft} task{routineLeft > 1 ? "s" : ""} left), then you can claim extra jobs.
+          </li>
+        )}
+        {extra.length > 0 && !mustFinishRoutine && (
           <li className="text-xs text-stone-500">Tap <b>Claim</b> and the job moves to <b>My jobs</b>, where you clock in, take photos and send it for review.</li>
         )}
         {extra.map((j) => (
           <li key={j.id} className="card flex items-start justify-between gap-3">
             <JobHeader job={j} />
-            <form action={claimJob.bind(null, j.id)}>
-              <SubmitButton className="btn-gold" pendingText="Claiming…">Claim</SubmitButton>
-            </form>
+            {mustFinishRoutine ? (
+              <span className="shrink-0 rounded-xl bg-stone-100 px-3 py-2 text-center text-xs font-semibold text-stone-500">🔒 Routine first</span>
+            ) : (
+              <form action={claimJob.bind(null, j.id)}>
+                <SubmitButton className="btn-gold" pendingText="Claiming…">Claim</SubmitButton>
+              </form>
+            )}
           </li>
         ))}
       </Section>

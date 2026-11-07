@@ -18,6 +18,7 @@ import {
   type Payout,
   type Routine,
   type RoutineCheck,
+  type RoutineDay,
   type Shift,
   type TimeEntry,
 } from "./data";
@@ -32,6 +33,7 @@ export function ParentView({
   shifts = [],
   routines = [],
   checks = [],
+  routineDays = [],
   tz = "America/Los_Angeles",
 }: {
   members: Member[];
@@ -42,6 +44,7 @@ export function ParentView({
   shifts?: Shift[];
   routines?: Routine[];
   checks?: RoutineCheck[];
+  routineDays?: RoutineDay[];
   tz?: string;
 }) {
   const rweek = routineWeek(tz);
@@ -63,7 +66,7 @@ export function ParentView({
       {kids.length > 0 && (
         <section className="grid gap-3 sm:grid-cols-2">
           {kids.map((k) => {
-            const t = kidTotals(k.id, jobs, time, payouts, shifts, k.pay_type);
+            const t = kidTotals(k.id, jobs, time, payouts, shifts, routineDays);
             const header = (
               <div className="flex items-start justify-between gap-2">
                 <Link href={`/crew/member/${k.id}`} className="group min-w-0">
@@ -118,7 +121,17 @@ export function ParentView({
               return (
                 <div key={k.id} className="card space-y-3">
                   {header}
-                  <p className="text-xs text-bronze">Payroll · daily routine</p>
+                  <p className="text-xs text-bronze">
+                    Payroll · daily routine{k.daily_rate ? ` · ${money(k.daily_rate)}/day` : ""}
+                  </p>
+                  <dl className="grid grid-cols-3 text-center text-sm">
+                    <div><dt className="text-[11px] uppercase text-bronze">Month</dt><dd className="font-bold">{money(t.routineEarnedThisMonth)}</dd></div>
+                    <div><dt className="text-[11px] uppercase text-bronze">Days</dt><dd className="font-bold">{t.routineDaysThisMonth}</dd></div>
+                    <div>
+                      <dt className="text-[11px] uppercase text-bronze">{t.paidAhead > 0 ? "Paid ahead" : "Owed"}</dt>
+                      <dd className="font-bold text-brand">{money(t.paidAhead > 0 ? t.paidAhead : t.owed)}</dd>
+                    </div>
+                  </dl>
                   {mine.length === 0 ? (
                     <p className="text-sm text-stone-500">No routine set. <Link className="font-semibold text-brand" href="/crew/team">Add one</Link></p>
                   ) : (
@@ -147,8 +160,14 @@ export function ParentView({
                       </div>
                     </>
                   )}
-                  {t.owed > 0 && <p className="text-xs text-stone-500">Extra jobs owed: <b className="text-brand">{money(t.owed)}</b></p>}
-                  {t.payrollPaid > 0 && <p className="text-xs text-stone-500">Payroll recorded: {money(t.payrollPaid)}</p>}
+                  {t.owed > 0 && (
+                    <form action={payBalance.bind(null, k.id, t.owed, "Routine days + extra jobs")} className="flex gap-2">
+                      <select name="method" defaultValue="Payroll" className="input w-auto" aria-label="Payment method">
+                        {PAY_METHODS.map((m) => <option key={m}>{m}</option>)}
+                      </select>
+                      <SubmitButton className="btn-gold flex-1" pendingText="Saving…">Mark {money(t.owed)} paid</SubmitButton>
+                    </form>
+                  )}
                   <Link href={`/crew/member/${k.id}`} className="block text-center text-xs font-semibold text-brand">See this week →</Link>
                 </div>
               );

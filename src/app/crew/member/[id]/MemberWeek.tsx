@@ -32,6 +32,7 @@ export async function MemberWeek({
   sign: (paths: string[]) => Promise<(string | null)[]>;
 }) {
   const { profile, familyName, timezone: tz, members, jobs, time, payouts, notifications, shifts, routines, checks } = data;
+  const earnedDays = data.routineDays ?? [];
   const m = members.find((x) => x.id === id && x.role === "kid");
   if (!m) notFound();
 
@@ -81,6 +82,9 @@ export async function MemberWeek({
   const doneSoFar = routineDays
     .filter((d) => d <= today)
     .reduce((n, d) => n + myRoutines.filter((r) => r.days.includes(isoDow(d)) && checkFor(r, d)).length, 0);
+
+  const weekRoutineDays = earnedDays.filter((x) => x.kid_id === m.id && x.day >= start && x.day <= end);
+  const routinePay = weekRoutineDays.reduce((a, x) => a + Number(x.amount), 0);
 
   // Pay
   const paidThisWeek = payouts.filter((p) => p.kid_id === m.id && inWeek(p.paid_at));
@@ -134,9 +138,9 @@ export async function MemberWeek({
             </>
           ) : m.pay_type === "payroll" ? (
             <>
-              <Tile label="Routine" value={dueSoFar.length ? `${doneSoFar}/${dueSoFar.length}` : "—"} highlight />
-              <Tile label="Jobs done" value={String(approved.length)} />
-              <Tile label="Job pay" value={money(jobPay)} />
+              <Tile label="Routine" value={dueSoFar.length ? `${doneSoFar}/${dueSoFar.length}` : "—"} />
+              <Tile label="Routine pay" value={money(routinePay)} highlight />
+              <Tile label="Extra jobs" value={money(jobPay)} />
             </>
           ) : (
             <>
@@ -159,6 +163,9 @@ export async function MemberWeek({
                   <li key={d}>
                     <p className={`text-sm font-semibold ${d === today ? "text-brand" : ""}`}>
                       {prettyDate(d)} {d === today && <span className="pill ml-1 bg-gold/20 text-brand-dark">Today</span>}
+                      {weekRoutineDays.find((x) => x.day === d) && (
+                        <span className="pill ml-1 bg-brand-soft text-brand">+{money(weekRoutineDays.find((x) => x.day === d)!.amount)}</span>
+                      )}
                     </p>
                     <ul className="mt-1 space-y-1">
                       {due.map((r) => {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireParent } from "@/lib/auth";
-import { hoursForJob, loadCrew, localDate, shiftHours, type Routine, type RoutineCheck, type Shift } from "../data";
+import { hoursForJob, loadCrew, localDate, shiftHours, type Routine, type RoutineCheck, type RoutineDay, type Shift } from "../data";
 
 const csv = (rows: (string | number | null | undefined)[][]) =>
   rows.map((r) => r.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -17,11 +17,13 @@ export async function GET(req: Request) {
   const to = `${year}-12-31`;
 
   // Full-year shift and routine records (the dashboard only loads recent ones).
-  const [shiftsRes, routinesRes, checksRes] = await Promise.all([
+  const [shiftsRes, routinesRes, checksRes, daysRes] = await Promise.all([
     supabase.from("shifts").select("*").gte("started_at", `${year - 1}-12-31`).lte("started_at", `${year + 1}-01-01`).order("started_at"),
     supabase.from("routines").select("*"),
     supabase.from("routine_checks").select("*").gte("check_date", from).lte("check_date", to).order("check_date"),
+    supabase.from("routine_days").select("*").gte("day", from).lte("day", to).order("day"),
   ]);
+  const routineDays = (daysRes.data ?? []) as RoutineDay[];
   const shifts = (shiftsRes.data ?? []) as Shift[];
   const routines = (routinesRes.data ?? []) as Routine[];
   const checks = (checksRes.data ?? []) as RoutineCheck[];
@@ -48,6 +50,9 @@ export async function GET(req: Request) {
       "", "payroll", "", "",
     ];
   });
+  const dayRows = routineDays.map((x) => [
+    "ROUTINE DAY", x.day, nameOf(x.kid_id), positionOf(x.kid_id), "All routine tasks completed", "Daily rate", "", "payroll", x.rate, x.amount,
+  ]);
   const paid = payouts
     .filter((p) => inYear(p.paid_at))
     .map((p) => ["PAYOUT", localDate(tz, p.paid_at), nameOf(p.kid_id), positionOf(p.kid_id), p.note, p.method, "", "", "", p.amount]);
@@ -58,7 +63,7 @@ export async function GET(req: Request) {
   const body = csv([
     [`${familyName} — Nestwell Crew records ${year}`],
     ["type", "date", "crew member", "position", "work / note", "category / method / detail", "hours", "pay type", "rate", "amount"],
-    ...[...work, ...shiftRows, ...routineRows, ...paid].sort(byDate),
+    ...[...work, ...shiftRows, ...routineRows, ...dayRows, ...paid].sort(byDate),
   ]);
   return new NextResponse(body, {
     headers: {

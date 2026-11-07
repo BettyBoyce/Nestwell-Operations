@@ -35,6 +35,7 @@ export type Member = {
   shift_start?: string | null;
   shift_end?: string | null;
   position_title?: string | null;
+  daily_rate?: number | null;
 };
 export type Shift = {
   id: string;
@@ -47,6 +48,8 @@ export type Shift = {
 };
 export type Routine = { id: string; kid_id: string; title: string; days: number[]; sort: number; active: boolean };
 export type RoutineCheck = { id: string; routine_id: string; kid_id: string; check_date: string; checked_at: string };
+/** A fully-completed routine day and what it earned (migration 0004). */
+export type RoutineDay = { id: string; kid_id: string; day: string; rate: number; amount: number; completed_at: string };
 
 export const JOB_CATEGORIES = [
   "Turnover",
@@ -65,7 +68,7 @@ export const DAY_NAMES = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]; 
 
 export async function loadCrew() {
   const { supabase, profile } = await requireProfile();
-  const [family, members, jobs, time, payouts, notes, shifts, routines, checks] = await Promise.all([
+  const [family, members, jobs, time, payouts, notes, shifts, routines, checks, routineDays] = await Promise.all([
     supabase.from("families").select("*").eq("id", profile.family_id).single(),
     supabase.from("profiles").select("*").order("created_at"),
     supabase.from("jobs").select("*").order("created_at", { ascending: false }).limit(300),
@@ -76,12 +79,14 @@ export async function loadCrew() {
     supabase.from("shifts").select("*").order("started_at", { ascending: false }).limit(500),
     supabase.from("routines").select("*").eq("active", true).order("sort"),
     supabase.from("routine_checks").select("*").gte("check_date", isoDaysAgo(45)),
+    supabase.from("routine_days").select("*").order("day", { ascending: false }).limit(2000),
   ]);
   const me = ((members.data ?? []) as Member[]).find((m) => m.id === profile.id);
   // Database updates that haven't been run yet (shown to parents as a banner).
   const pendingUpdates: string[] = [];
   if (jobs.data?.length && !("photo_required" in (jobs.data[0] as object))) pendingUpdates.push("0002_required_photos.sql");
   if (shifts.error || routines.error) pendingUpdates.push("0003_pay_types_shifts_routines.sql");
+  if (routineDays.error) pendingUpdates.push("0004_daily_rate_and_claim_rule.sql");
   return {
     supabase,
     profile: { ...profile, ...me } as typeof profile & Member,
@@ -95,6 +100,7 @@ export async function loadCrew() {
     shifts: (shifts.data ?? []) as Shift[],
     routines: (routines.data ?? []) as Routine[],
     checks: (checks.data ?? []) as RoutineCheck[],
+    routineDays: (routineDays.data ?? []) as RoutineDay[],
     pendingUpdates,
   };
 }
@@ -184,35 +190,39 @@ export function kidTotals(
   time: TimeEntry[],
   payouts: Payout[],
   shifts: Shift[] = [],
-  payType?: PayType | null,
+  routineDays: RoutineDay[] = [],
 ) {
   const jobEarned = jobs
     .filter((j) => j.assigned_to === kidId && j.status === "approved")
     .reduce((s, j) => s + Number(j.earned_amount ?? 0), 0);
   const mine = shifts.filter((s) => s.kid_id === kidId);
   const shiftEarned = mine.reduce((s, x) => s + Number(x.amount ?? 0), 0);
-  const earned = jobEarned + shiftEarned;
-  // Payroll crew: "Payroll" payments are their regular payroll, tracked separately from job/shift balances.
-  const theirs = payouts.filter((p) => p.kid_id === kidId);
-  const isPayrollPay = (p: Payout) => payType === "payroll" && p.method === "Payroll";
-  const payrollPaid = theirs.filter(isPayrollPay).reduce((s, p) => s + Number(p.amount), 0);
-  const paid = theirs.filter((p) => !isPayrollPay(p)).reduce((s, p) => s + Number(p.amount), 0);
-  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+  const myDays = routineDays.filter((d) => d.kid_id === kidId);
+  const routineEarned = myDays.reduce((s, d) => s + Number(d.amount), 0);
+  const earned = jobEarned + shiftEarned + routineEarned;
+  const paid = payouts.filter((p) => p.kid_id === kidId).reduce((s, p) => s + Number(p.amount), 0);
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const jobHours = time
     .filter((t) => t.kid_id === kidId && t.ended_at && new Date(t.started_at).getTime() >= monthStart)
     .reduce((h, t) => h + (new Date(t.ended_at!).getTime() - new Date(t.started_at).getTime()) / 3_600_000, 0);
   const shiftHoursMonth = mine
     .filter((s) => s.ended_at && new Date(s.started_at).getTime() >= monthStart)
     .reduce((h, s) => h + shiftHours(s), 0);
+  const monthDays = myDays.filter((d) => d.day.startsWith(monthKey));
   const activeTimer = time.find((t) => t.kid_id === kidId && !t.ended_at) ?? null;
   const openShift = mine.find((s) => !s.ended_at) ?? null;
   const balance = Math.round((earned - paid) * 100) / 100;
   return {
     earned,
+    jobEarned,
+    routineEarned,
+    routineDaysThisMonth: monthDays.length,
+    routineEarnedThisMonth: monthDays.reduce((s, d) => s + Number(d.amount), 0),
     paid,
-    payrollPaid,
     owed: Math.max(0, balance), // never shown as negative
-    paidAhead: Math.max(0, -balance), // paid more than earned (e.g. payroll recorded before 0003 ran)
+    paidAhead: Math.max(0, -balance), // paid before it was earned (e.g. monthly payroll paid up front)
     hoursThisMonth: jobHours + shiftHoursMonth,
     activeTimer,
     openShift,

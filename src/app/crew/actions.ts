@@ -281,17 +281,22 @@ export async function updatePaySetup(memberId: string, formData: FormData) {
   if (!["per_job", "hourly", "payroll"].includes(payType)) fail("/crew/team", "Choose how this person is paid.");
   const rate = str(formData, "hourly_rate");
   if (payType === "hourly" && !(Number(rate) > 0)) fail("/crew/team", "Enter an hourly rate.");
-  const { error } = await supabase
-    .from("profiles")
-    .update({
+  const dailyRate = str(formData, "daily_rate");
+  const update: Record<string, unknown> = {
       pay_type: payType,
       hourly_rate: rate ? Number(rate) : null,
       work_days: formData.getAll("work_days").map(Number).filter((d) => d >= 1 && d <= 7),
       shift_start: str(formData, "shift_start") || null,
       shift_end: str(formData, "shift_end") || null,
       position_title: str(formData, "position_title") || null,
-    })
-    .eq("id", memberId);
+      daily_rate: dailyRate ? Number(dailyRate) : null,
+  };
+  let { error } = await supabase.from("profiles").update(update).eq("id", memberId);
+  if (error && /daily_rate/.test(error.message)) {
+    // Database not yet updated with 0004 — save everything else.
+    delete update.daily_rate;
+    ({ error } = await supabase.from("profiles").update(update).eq("id", memberId));
+  }
   if (error) fail("/crew/team", error.message);
   done("/crew/team");
 }

@@ -36,6 +36,7 @@ When a new file appears in `supabase/migrations/`, run it once in **Supabase →
 - `0001_crew.sql`: the base setup
 - `0002_required_photos.sql`: required completion photos, with several photos per job
 - `0003_pay_types_shifts_routines.sql`: pay types (per job, hourly, payroll), the shift clock, weekly pay and daily routines
+- `0004_daily_rate_and_claim_rule.sql`: daily routine pay rates and the "routine first" rule for claiming extra jobs
 
 You can check what's installed at `/api/health`.
 

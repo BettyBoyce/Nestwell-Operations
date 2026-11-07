@@ -49,7 +49,7 @@ export function WeekCalendar({
             <span className="text-[11px] font-semibold uppercase tracking-wide">{DAY_NAMES[isoDow(d.date)]}</span>
             <span className="text-xl font-bold leading-tight">{dayNum}</span>
             <span className="h-4 text-[10px] font-semibold leading-4">
-              {d.status === "done" ? "✓" : d.badge ?? (d.date === today ? "Today" : "")}
+              {d.status === "done" ? (d.badge ? `✓ ${d.badge}` : "✓") : d.badge ?? (d.date === today ? "Today" : "")}
             </span>
           </Link>
         );

@@ -45,10 +45,10 @@ These records support payroll, the bookkeeper and the CPA, and they document rea
 
 Full position descriptions are in [`docs/positions/`](positions/README.md).
 
-**Daily routines:**
-- **Landon:** Garbage & recycling service · Lawn care
-- **Maxine:** Dishes: unload & reload the dishwasher
-- **Renlee:** Dust the baseboards & wood screens
+**Daily routines and daily rates** (earned each weekday all routine tasks are checked off):
+- **Landon:** Garbage & recycling service · Lawn care. **$6.25/day** ($125/month ÷ 20 weekdays)
+- **Maxine:** Dishes: unload & reload the dishwasher. **$6.25/day** ($125/month ÷ 20)
+- **Renlee:** Dust the baseboards & wood screens. **$2.50/day** ($50/month ÷ 20)
 
 > Pay types, rates, schedules and routines can be changed at any time on **Team & Pay** (see 5.6). If this table and the app disagree, the app is the source of truth.
 
@@ -108,7 +108,9 @@ Notifications appear **inside the app** only. There are no texts or lock-screen 
 1. Do your routine task(s).
 2. Open the app. **Today's date is already selected.** (To open a different day, tap it on the calendar.)
 3. Tap each task **after it's finished**. It turns green with a ✓.
-4. When every task for that day is checked, you'll see **"All done for this day. Nice work! ✓"**, the day turns green on the calendar, and a parent is notified.
+4. When every task for that day is checked, you **earn your daily rate** for that day. You'll see **"All done. You earned $6.25 for this day! ✓"**, the day turns green with **✓ +$6.25** on the calendar, and a parent is notified.
+   - Every task must be checked to earn the day. A partly-done day earns $0.
+   - Unchecking a task removes that day's pay until it's checked again.
 
 **Rules:**
 - Check a task off **only after it's actually done**.
@@ -121,6 +123,8 @@ Notifications appear **inside the app** only. There are no texts or lock-screen 
 Parents post two kinds of jobs:
 - **My jobs:** assigned to you
 - **Extra jobs — earn more:** open to anyone; the first person to tap **Claim** gets it
+
+> **Routine first rule:** if you have a routine today, you must check off **every** routine task for today before you can claim an extra job. Until then, extra jobs show **🔒 Routine first**. On days with no routine (e.g. weekends), you can claim extra jobs anytime.
 
 **To complete a job:**
 1. **Extra job:** tap **Claim**. It moves to **My jobs**.
@@ -174,9 +178,9 @@ Pay outside the app (**Venmo, Check, Cash or Payroll**), then **record it in the
 
 **Owed** = everything earned (approved jobs + completed shifts) − everything recorded as paid.
 
-> **Payroll crew (Landon, Maxine, Renlee):** you can record their payroll payments with method **Payroll**. These are kept as a payroll record and **don't** reduce what they're owed for extra jobs. Extra-job payments should use Venmo, Check or Cash.
+> **Payroll crew (Landon, Maxine, Renlee):** each fully completed routine day adds their daily rate to **earned**. Approved extra jobs add to it too. Record their pay (method **Payroll**, or Venmo, Check or Cash for extra jobs) and it's subtracted. Their card shows **Month** (routine pay this month), **Days** (complete days this month) and **Owed**. When owed is above $0, a **Mark $___ paid** button appears.
 >
-> **Owed** never shows below $0. If more has been recorded as paid than was earned, the card shows **"Paid ahead $___"** instead.
+> **Owed** never shows below $0. If you pay before the days are earned (e.g. monthly payroll paid up front), the card shows **"Paid ahead $___"**, which shrinks as days are completed.
 
 ### 5.5 Fixing a shift (forgot to clock in or out, wrong time)
 1. **Team & Pay** → tap **Kyle** → scroll to **This pay week**.
@@ -215,7 +219,7 @@ Use **‹ ›** to look back up to 6 weeks. Kyle's week runs **Saturday–Friday
 | Pay type | Who | How earnings are calculated | When paid |
 |---|---|---|---|
 | **Hourly** | Kyle | Shift hours × hourly rate, to the minute. The rate is locked at clock-in. | Fridays, for the Saturday–Friday week |
-| **Payroll** | Landon, Maxine, Renlee | Through payroll, outside the app. The app records routine completion. | Per payroll schedule |
+| **Payroll** | Landon, Maxine, Renlee | **Daily rate × fully completed routine days** (Landon & Maxine $6.25, Renlee $2.50). The rate is locked when the day is completed. | Per payroll schedule |
 | **Per job** | Brandon (and extra jobs for anyone) | Flat amount, or hours on the job × job rate, **on approval** | When a payout is recorded |
 
 - All times are **Pacific** (Salem, Oregon).
@@ -253,6 +257,8 @@ Use **‹ ›** to look back up to 6 weeks. Kyle's week runs **Saturday–Friday
 | **Can't tap "Mark done & send for review"** | The job needs at least one photo. Tap **Take or choose photo** first. |
 | **Photo won't upload / "Photo upload failed"** | Check the internet connection and try again. Take a new photo instead of using an old one, and try fewer photos at once. |
 | **"Job is no longer available"** | Someone else claimed that extra job first. |
+| **Extra jobs show "🔒 Routine first"** | Check off every routine task for today first. Then the **Claim** buttons appear. |
+| **Checked my routine but didn't earn anything** | Every task for that day must be checked. If they all are, ask a parent to confirm your **daily rate** is set on Team & Pay. |
 | **Claimed job disappeared from Extra jobs** | It's now under **My jobs**. Scroll up. |
 
 ### 8.2 Parent problems
@@ -290,6 +296,7 @@ Open **https://nestwell-operations.vercel.app/api/health**. Every item should be
 | `database_tables`, `crew_functions`, `photo_bucket` | Run `supabase/migrations/0001_crew.sql` (9.5) |
 | `required_photos_update` | Run `0002_required_photos.sql` |
 | `shifts_routines_update` | Run `0003_pay_types_shifts_routines.sql` |
+| `daily_rate_update` | Run `0004_daily_rate_and_claim_rule.sql` |
 | `signup_open: true` | Anyone can create a new family account. Set `ALLOW_SIGNUP` = `false` in Vercel and **Redeploy** (recommended). |
 
 The `notes` list explains anything that's missing. The page never shows passwords or keys.
@@ -330,6 +337,7 @@ Every migration file is safe to run more than once.
 | `0001_crew.sql` | Base tables, security rules, photo storage |
 | `0002_required_photos.sql` | Required photos, several photos per job |
 | `0003_pay_types_shifts_routines.sql` | Pay types, hourly shifts, routines, crew setup |
+| `0004_daily_rate_and_claim_rule.sql` | Daily routine pay rates, "routine first" rule for extra jobs |
 
 ### 9.6 Security basics
 - The Supabase **service role / secret key** gives full access. It lives only in Vercel's settings. Never share it, paste it in chat or commit it to GitHub.

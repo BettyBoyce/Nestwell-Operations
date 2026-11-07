@@ -1,5 +1,6 @@
 import { toggleRoutine } from "./actions";
-import { addDays, isoDow, localDate, prettyDate, type Member, type Routine, type RoutineCheck } from "./data";
+import { money } from "@/lib/auth";
+import { addDays, isoDow, localDate, prettyDate, type Member, type Routine, type RoutineCheck, type RoutineDay } from "./data";
 import { WeekCalendar, type CalendarDay } from "./WeekCalendar";
 
 /**
@@ -10,12 +11,14 @@ export function RoutineCard({
   me,
   routines,
   checks,
+  routineDays = [],
   tz,
   selectedDay,
 }: {
   me: Member;
   routines: Routine[];
   checks: RoutineCheck[];
+  routineDays?: RoutineDay[];
   tz: string;
   selectedDay?: string;
 }) {
@@ -29,13 +32,15 @@ export function RoutineCard({
 
   const dueOn = (d: string) => routines.filter((r) => r.days.includes(isoDow(d)));
   const isDone = (r: Routine, d: string) => checks.some((c) => c.routine_id === r.id && c.check_date === d);
+  const rate = Number(me.daily_rate ?? 0);
+  const earnedOn = (d: string) => routineDays.find((x) => x.kid_id === me.id && x.day === d);
 
   const calendar: CalendarDay[] = weekdays.map((d) => {
     const due = dueOn(d);
     const n = due.filter((r) => isDone(r, d)).length;
     if (!due.length) return { date: d, status: "off", badge: "Off" };
     if (d > today) return { date: d, status: "upcoming" };
-    if (n === due.length) return { date: d, status: "done" };
+    if (n === due.length) return { date: d, status: "done", badge: earnedOn(d) ? `+${money(earnedOn(d)!.amount)}` : undefined };
     if (n > 0) return { date: d, status: "partial", badge: `${n}/${due.length}` };
     return { date: d, status: d === today ? "open" : "missed", badge: d === today ? "Today" : `0/${due.length}` };
   });
@@ -56,6 +61,9 @@ export function RoutineCard({
           Week of {prettyDate(weekdays[0], { month: "short", day: "numeric" })}
         </span>
       </div>
+      {rate > 0 && (
+        <p className="-mt-3 text-xs text-bronze">Finish every task on a day to earn {money(rate)} for that day.</p>
+      )}
 
       {routines.length === 0 ? (
         <p className="text-sm text-stone-500">No routine set up yet. Ask a parent to add yours.</p>
@@ -113,7 +121,9 @@ export function RoutineCard({
                     : tooOld
                       ? "This day is in a past week. Ask a parent if something is missing."
                       : doneCount === due.length
-                        ? "All done for this day. Nice work! ✓"
+                        ? earnedOn(day)
+                          ? `All done. You earned ${money(earnedOn(day)!.amount)} for this day! ✓`
+                          : "All done for this day. Nice work! ✓"
                         : `${doneCount} of ${due.length} done. Tap each task when it's finished.`}
                 </p>
               </>

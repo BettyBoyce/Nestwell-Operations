@@ -12,7 +12,8 @@ export const dynamic = "force-dynamic";
 export default async function TeamPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requireParent();
   const { error } = await searchParams;
-  const { profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, pendingUpdates } = await loadCrew();
+  const { profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, routineDays, pendingUpdates } =
+    await loadCrew();
   const kids = members.filter((m) => m.role === "kid");
   const nameOf = (id: string) => members.find((m) => m.id === id)?.display_name ?? "—";
 
@@ -30,7 +31,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
           <p className="mt-1 text-xs text-stone-500">Tap a person to set how they&apos;re paid, their schedule, routine or timesheet.</p>
           <ul className="mt-3 divide-y divide-stone-100">
             {kids.map((k) => {
-              const t = kidTotals(k.id, jobs, time, payouts, shifts, k.pay_type);
+              const t = kidTotals(k.id, jobs, time, payouts, shifts, routineDays);
               const how =
                 k.pay_type === "hourly"
                   ? `Hourly $${Number(k.hourly_rate ?? 0).toFixed(2)}${scheduleLabel(k) ? " · " + scheduleLabel(k) : ""}`
@@ -53,7 +54,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
                       <p className="shrink-0 text-right">
                         <span className="font-bold text-brand">{money(t.owed)}</span>
                         <span className="block text-xs text-stone-500">
-                          owed · {money(t.paid + t.payrollPaid)} paid{t.paidAhead > 0 ? ` · ${money(t.paidAhead)} ahead` : ""}
+                          owed · {money(t.paid)} paid{t.paidAhead > 0 ? ` · ${money(t.paidAhead)} ahead` : ""}
                         </span>
                       </p>
                     </summary>
