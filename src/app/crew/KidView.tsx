@@ -7,6 +7,7 @@ import {
   hoursForJob,
   routineOn,
   kidTotals,
+  nextPayday,
   localDate,
   payLabel,
   weekShifts,
@@ -79,7 +80,7 @@ export function KidView({
           <section className="grid grid-cols-3 gap-3">
             <Stat label="Earned this month" value={money(t.routineEarnedThisMonth)} highlight />
             <Stat label="Days complete" value={String(t.routineDaysThisMonth)} />
-            <Stat label={t.paidAhead > 0 ? "Paid ahead" : "Owed to you"} value={money(t.paidAhead > 0 ? t.paidAhead : t.owed)} />
+            <Stat label={t.paidAhead > 0 ? "Paid ahead" : `Paid to you ${nextPayday(tz)}`} value={money(t.paidAhead > 0 ? t.paidAhead : t.owed)} />
           </section>
         </>
       ) : (

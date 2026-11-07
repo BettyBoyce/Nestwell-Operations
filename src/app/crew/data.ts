@@ -161,6 +161,13 @@ export function routineWeek(tz: string) {
   return { today, days: Array.from({ length: 7 }, (_, i) => addDays(monday, i)) };
 }
 
+/** Payroll crew are paid on the 1st of the following month, e.g. "Dec 1". */
+export function nextPayday(tz: string) {
+  const [y, m] = localDate(tz).split("-").map(Number);
+  const d = new Date(Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 1, 12));
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
 /** Is this routine due on a date? Not before the day it was created (so new routines don't show past days as missed). */
 export const routineOn = (r: Routine, ymd: string, tz: string) =>
   r.days.includes(isoDow(ymd)) && (!r.created_at || localDate(tz, r.created_at) <= ymd);

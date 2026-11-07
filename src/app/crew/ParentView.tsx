@@ -9,6 +9,7 @@ import {
   isoDow,
   JOB_CATEGORIES,
   kidTotals,
+  nextPayday,
   PAY_METHODS,
   routineOn,
   routineWeekdays,
@@ -129,7 +130,7 @@ export function ParentView({
                     <div><dt className="text-[11px] uppercase text-bronze">Month</dt><dd className="font-bold">{money(t.routineEarnedThisMonth)}</dd></div>
                     <div><dt className="text-[11px] uppercase text-bronze">Days</dt><dd className="font-bold">{t.routineDaysThisMonth}</dd></div>
                     <div>
-                      <dt className="text-[11px] uppercase text-bronze">{t.paidAhead > 0 ? "Paid ahead" : "Owed"}</dt>
+                      <dt className="text-[11px] uppercase text-bronze">{t.paidAhead > 0 ? "Paid ahead" : `Due ${nextPayday(tz)}`}</dt>
                       <dd className="font-bold text-brand">{money(t.paidAhead > 0 ? t.paidAhead : t.owed)}</dd>
                     </div>
                   </dl>

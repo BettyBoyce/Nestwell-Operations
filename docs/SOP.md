@@ -178,9 +178,9 @@ Pay outside the app (**Venmo, Check, Cash or Payroll**), then **record it in the
 
 **Owed** = everything earned (approved jobs + completed shifts) − everything recorded as paid.
 
-> **Payroll crew (Landon, Maxine, Renlee):** each fully completed routine day adds their daily rate to **earned**. Approved extra jobs add to it too. Record their pay (method **Payroll**, or Venmo, Check or Cash for extra jobs) and it's subtracted. Their card shows **Month** (routine pay this month), **Days** (complete days this month) and **Owed**. When owed is above $0, a **Mark $___ paid** button appears.
+> **Payroll crew (Landon, Maxine, Renlee):** each fully completed routine day adds their daily rate to **earned**. Approved extra jobs add to it too. Record their pay (method **Payroll**, or Venmo, Check or Cash for extra jobs) and it's subtracted. Their card shows **Month** (routine pay this month), **Days** (complete days this month) and **Due [1st of next month]**. Routine pay is paid on the **1st of the following month**: on the 1st, tap **Mark $___ paid** (method **Payroll**) to record last month's pay.
 >
-> **Owed** never shows below $0. If you pay before the days are earned (e.g. monthly payroll paid up front), the card shows **"Paid ahead $___"**, which shrinks as days are completed.
+> **Owed** never shows below $0. If more is recorded as paid than has been earned, the card shows **"Paid ahead $___"**. October 2026 routine pay (before the app) was entered as an approved "October 2026 routine pay" entry so it matches the payments recorded on Nov 1.
 
 ### 5.5 Fixing a shift (forgot to clock in or out, wrong time)
 1. **Team & Pay** → tap **Kyle** → scroll to **This pay week**.
