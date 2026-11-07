@@ -10,7 +10,8 @@ import {
   JOB_CATEGORIES,
   kidTotals,
   PAY_METHODS,
-  routineWeek,
+  routineOn,
+  routineWeekdays,
   scheduleLabel,
   weekShifts,
   type Job,
@@ -47,7 +48,7 @@ export function ParentView({
   routineDays?: RoutineDay[];
   tz?: string;
 }) {
-  const rweek = routineWeek(tz);
+  const rweek = routineWeekdays(tz);
   const kids = members.filter((m) => m.role === "kid");
   const nameOf = (id: string | null) => members.find((m) => m.id === id)?.display_name ?? "Unassigned";
   const review = jobs.filter((j) => j.status === "submitted");
@@ -115,8 +116,8 @@ export function ParentView({
             if (k.pay_type === "payroll") {
               const mine = routines.filter((r) => r.kid_id === k.id);
               const isDone = (r: Routine, d: string) => checks.some((c) => c.routine_id === r.id && c.check_date === d);
-              const workDays = rweek.days.filter((d) => mine.some((r) => r.days.includes(isoDow(d))));
-              const dueToday = mine.filter((r) => r.days.includes(isoDow(rweek.today)));
+              const workDays = rweek.days.filter((d) => mine.some((r) => routineOn(r, d, tz)));
+              const dueToday = mine.filter((r) => routineOn(r, rweek.today, tz));
               const doneToday = dueToday.filter((r) => isDone(r, rweek.today)).length;
               return (
                 <div key={k.id} className="card space-y-3">
@@ -137,11 +138,11 @@ export function ParentView({
                   ) : (
                     <>
                       <p className={`text-sm font-semibold ${dueToday.length && doneToday === dueToday.length ? "text-brand" : "text-stone-600"}`}>
-                        Today: {dueToday.length === 0 ? "nothing scheduled" : doneToday === dueToday.length ? "all done ✓" : `${doneToday} of ${dueToday.length} done`}
+                        Today: {dueToday.length === 0 ? "no routine today" : doneToday === dueToday.length ? "all done ✓" : `${doneToday} of ${dueToday.length} done`}
                       </p>
                       <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${Math.max(workDays.length, 1)}, minmax(0, 1fr))` }}>
                         {workDays.map((d) => {
-                          const due = mine.filter((r) => r.days.includes(isoDow(d)));
+                          const due = mine.filter((r) => routineOn(r, d, tz));
                           const n = due.filter((r) => isDone(r, d)).length;
                           const future = d > rweek.today;
                           return (

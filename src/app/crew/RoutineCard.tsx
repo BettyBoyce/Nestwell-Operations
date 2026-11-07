@@ -1,6 +1,6 @@
 import { toggleRoutine } from "./actions";
 import { money } from "@/lib/auth";
-import { addDays, isoDow, localDate, prettyDate, type Member, type Routine, type RoutineCheck, type RoutineDay } from "./data";
+import { prettyDate, routineOn, routineWeekdays, type Member, type Routine, type RoutineCheck, type RoutineDay } from "./data";
 import { WeekCalendar, type CalendarDay } from "./WeekCalendar";
 
 /**
@@ -22,15 +22,11 @@ export function RoutineCard({
   tz: string;
   selectedDay?: string;
 }) {
-  const today = localDate(tz);
-  const dow = isoDow(today);
-  // On Sat/Sun show the coming week so the calendar is always useful.
-  const monday = dow >= 6 ? addDays(today, 8 - dow) : addDays(today, 1 - dow);
-  const weekdays = [0, 1, 2, 3, 4].map((i) => addDays(monday, i));
-  const thisMonday = addDays(today, 1 - dow);
+  // Mon–Fri of this week; on Sat/Sun the coming week so the calendar is always useful.
+  const { today, days: weekdays, thisMonday } = routineWeekdays(tz);
   const earliest = thisMonday; // crew can catch up within the current week
 
-  const dueOn = (d: string) => routines.filter((r) => r.days.includes(isoDow(d)));
+  const dueOn = (d: string) => routines.filter((r) => routineOn(r, d, tz));
   const isDone = (r: Routine, d: string) => checks.some((c) => c.routine_id === r.id && c.check_date === d);
   const rate = Number(me.daily_rate ?? 0);
   const earnedOn = (d: string) => routineDays.find((x) => x.kid_id === me.id && x.day === d);

@@ -5,7 +5,7 @@ import { money } from "@/lib/auth";
 import { claimJob, clockIn, clockOut, submitJob } from "./actions";
 import {
   hoursForJob,
-  isoDow,
+  routineOn,
   kidTotals,
   localDate,
   payLabel,
@@ -51,7 +51,7 @@ export function KidView({
   const week = weekShifts(shifts, me.id, tz);
   const today = localDate(tz);
   const myRoutines = routines.filter((r) => r.kid_id === me.id);
-  const dueToday = myRoutines.filter((r) => r.days.includes(isoDow(today)));
+  const dueToday = myRoutines.filter((r) => routineOn(r, today, tz));
   const routineLeft = dueToday.filter((r) => !checks.some((c) => c.routine_id === r.id && c.check_date === today)).length;
   const mustFinishRoutine = routineLeft > 0;
   const mine = jobs.filter((j) => j.assigned_to === me.id);

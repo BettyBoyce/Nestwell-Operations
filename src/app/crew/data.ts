@@ -46,7 +46,7 @@ export type Shift = {
   amount: number | null;
   note: string | null;
 };
-export type Routine = { id: string; kid_id: string; title: string; days: number[]; sort: number; active: boolean };
+export type Routine = { id: string; kid_id: string; title: string; days: number[]; sort: number; active: boolean; created_at?: string };
 export type RoutineCheck = { id: string; routine_id: string; kid_id: string; check_date: string; checked_at: string };
 /** A fully-completed routine day and what it earned (migration 0004). */
 export type RoutineDay = { id: string; kid_id: string; day: string; rate: number; amount: number; completed_at: string };
@@ -159,6 +159,18 @@ export function routineWeek(tz: string) {
   const today = localDate(tz);
   const monday = addDays(today, -(isoDow(today) - 1));
   return { today, days: Array.from({ length: 7 }, (_, i) => addDays(monday, i)) };
+}
+
+/** Is this routine due on a date? Not before the day it was created (so new routines don't show past days as missed). */
+export const routineOn = (r: Routine, ymd: string, tz: string) =>
+  r.days.includes(isoDow(ymd)) && (!r.created_at || localDate(tz, r.created_at) <= ymd);
+
+/** Monday–Friday of this week (or of the coming week on Saturday/Sunday). */
+export function routineWeekdays(tz: string) {
+  const today = localDate(tz);
+  const dow = isoDow(today);
+  const monday = dow >= 6 ? addDays(today, 8 - dow) : addDays(today, 1 - dow);
+  return { today, days: [0, 1, 2, 3, 4].map((i) => addDays(monday, i)), thisMonday: addDays(today, 1 - dow) };
 }
 
 export const shiftHours = (s: Pick<Shift, "started_at" | "ended_at">) =>

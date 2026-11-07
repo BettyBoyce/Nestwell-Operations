@@ -6,6 +6,7 @@ import {
   addDays,
   hoursForJob,
   isoDow,
+  routineOn,
   loadCrew,
   localDate,
   payLabel,
@@ -77,11 +78,11 @@ export async function MemberWeek({
   // Routines
   const myRoutines = routines.filter((r) => r.kid_id === m.id);
   const checkFor = (r: Routine, d: string) => checks.find((c) => c.routine_id === r.id && c.check_date === d);
-  const routineDays = days.filter((d) => myRoutines.some((r) => r.days.includes(isoDow(d))));
-  const dueSoFar = routineDays.filter((d) => d <= today).flatMap((d) => myRoutines.filter((r) => r.days.includes(isoDow(d))));
+  const routineDays = days.filter((d) => myRoutines.some((r) => routineOn(r, d, tz)));
+  const dueSoFar = routineDays.filter((d) => d <= today).flatMap((d) => myRoutines.filter((r) => routineOn(r, d, tz)));
   const doneSoFar = routineDays
     .filter((d) => d <= today)
-    .reduce((n, d) => n + myRoutines.filter((r) => r.days.includes(isoDow(d)) && checkFor(r, d)).length, 0);
+    .reduce((n, d) => n + myRoutines.filter((r) => routineOn(r, d, tz) && checkFor(r, d)).length, 0);
 
   const weekRoutineDays = earnedDays.filter((x) => x.kid_id === m.id && x.day >= start && x.day <= end);
   const routinePay = weekRoutineDays.reduce((a, x) => a + Number(x.amount), 0);
@@ -157,7 +158,7 @@ export async function MemberWeek({
             <h2 className="text-xl text-brand">Routine check-offs</h2>
             <ul className="mt-3 space-y-3">
               {routineDays.map((d) => {
-                const due = myRoutines.filter((r) => r.days.includes(isoDow(d)));
+                const due = myRoutines.filter((r) => routineOn(r, d, tz));
                 const future = d > today;
                 return (
                   <li key={d}>
