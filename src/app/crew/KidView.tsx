@@ -28,6 +28,7 @@ export function KidView({
   routines = [],
   checks = [],
   tz = "America/Los_Angeles",
+  selectedDay,
 }: {
   me: Member;
   jobs: Job[];
@@ -37,6 +38,7 @@ export function KidView({
   routines?: Routine[];
   checks?: RoutineCheck[];
   tz?: string;
+  selectedDay?: string;
 }) {
   const t = kidTotals(me.id, jobs, time, payouts, shifts);
   const hourly = me.pay_type === "hourly";
@@ -53,7 +55,7 @@ export function KidView({
     <div className="space-y-6">
       {hourly ? (
         <>
-          <ShiftCard me={me} openShift={t.openShift} tz={tz} />
+          <ShiftCard me={me} openShift={t.openShift} shifts={shifts} tz={tz} selectedDay={selectedDay} />
           <section className="grid grid-cols-3 gap-3">
             <Stat label="This week" value={money(week.amount)} highlight />
             <Stat label="Hours this week" value={week.hours.toFixed(2)} />
@@ -62,7 +64,7 @@ export function KidView({
           <WeekShiftList week={week} tz={tz} />
         </>
       ) : payroll ? (
-        <RoutineCard me={me} routines={routines.filter((r) => r.kid_id === me.id)} checks={checks} tz={tz} />
+        <RoutineCard me={me} routines={routines.filter((r) => r.kid_id === me.id)} checks={checks} tz={tz} selectedDay={selectedDay} />
       ) : (
         <section className="grid grid-cols-3 gap-3">
           <Stat label="Owed to you" value={money(t.owed)} highlight />

@@ -85,10 +85,13 @@ Notifications appear **inside the app** only. There are no texts or lock-screen 
 ## 4. Crew member procedures
 
 ### 4.1 Hourly shifts (Kyle)
+**My shifts** shows a calendar of your scheduled days this pay week, with dates (e.g. **Tue 10 · Fri 13**). Today is always included.
+
 **Every scheduled shift (Tuesday & Friday, 10 AM–2 PM):**
-1. **When you arrive:** open the app → tap **Clock in**. The card turns gold and a timer starts.
+1. **When you arrive:** open the app → today's date is already selected → tap **Clock in**. A timer starts and the day shows **On clock**.
 2. Do your work.
-3. **When you leave:** tap **Clock out**. The shift's hours and pay appear in **This pay week**.
+3. **When you leave:** tap **Clock out**. The day turns green with that day's pay (e.g. **$108**), and the week's total updates.
+4. Tap any other day to see it: past days show the hours and pay recorded; upcoming days show your scheduled time. The **Clock in** button only appears on today's date.
 
 **Rules:**
 - Clock in **when you start working**, not before, and clock out **before you leave**.
@@ -99,17 +102,20 @@ Notifications appear **inside the app** only. There are no texts or lock-screen 
 **Your dashboard shows:** your schedule and rate, **This week** pay, **Hours this week**, **Owed to you**, and a list of each shift in the pay week (Saturday–Friday).
 
 ### 4.2 Daily routines (Landon, Maxine, Renlee)
+**My routine** shows a **Monday–Friday calendar with dates** (on weekends it shows the coming week).
+
 **Every routine day (Monday–Friday):**
 1. Do your routine task(s).
-2. Open the app. Under **Today's routine**, tap each task **after it's finished**. It turns green with a ✓.
-3. When every task is checked, you'll see **"All done for today. Nice work! ✓"** and a parent is notified.
+2. Open the app. **Today's date is already selected.** (To open a different day, tap it on the calendar.)
+3. Tap each task **after it's finished**. It turns green with a ✓.
+4. When every task for that day is checked, you'll see **"All done for this day. Nice work! ✓"**, the day turns green on the calendar, and a parent is notified.
 
 **Rules:**
 - Check a task off **only after it's actually done**.
 - **Tapped one by mistake?** Tap it again to uncheck it.
-- **This week** strip: green ✓ = done, gold = partly done, red = missed, gray = upcoming.
-- **Forgot to check off an earlier day?** Open **"Forgot to check something earlier this week?"** and tap **I did it** next to that day. Late check-offs are marked as late on the parent's view.
-- The catch-up list covers earlier days **this week** (Monday onward). Anything older needs a parent. You can't check off future days.
+- **Calendar colors:** green ✓ = done, gold = partly done (e.g. 1/2), red = missed, white = upcoming, gray "Off" = no routine that day.
+- **Forgot to check off an earlier day?** Tap that day on the calendar and check the tasks. Late check-offs are marked as late on the parent's view.
+- You can catch up on any earlier day **this week** (Monday onward). Past weeks need a parent. Future days are view-only until that day.
 
 ### 4.3 Jobs and extra jobs (everyone)
 Parents post two kinds of jobs:
@@ -174,7 +180,7 @@ Pay outside the app (**Venmo, Check, Cash or Payroll**), then **record it in the
 1. **Team & Pay** → tap **Kyle** → scroll to **This pay week**.
 2. Find the shift and correct **Date**, **In** and **Out** (Pacific time). Add a **Note** (e.g. "Forgot to clock out, left at 2:00").
 3. Tap **Save**. Pay recalculates automatically.
-- **Forgot to clock in entirely:** have him clock in and out now, then correct the times as above.
+- **Forgot to clock in entirely:** under **Add a missed shift**, enter the date and the real in/out times, add a note, then tap **Add shift**. Pay is calculated at his hourly rate.
 - **Delete shift** removes a shift entered by mistake.
 - Shifts from the current and previous pay week can be fixed on this screen.
 

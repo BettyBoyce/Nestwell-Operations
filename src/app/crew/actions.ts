@@ -207,6 +207,23 @@ export async function fixShift(shiftId: string, tz: string, formData: FormData) 
   done("/crew/team");
 }
 
+/** Parent adds a shift that was never clocked. Times are local (family time zone). */
+export async function addShift(kidId: string, tz: string, formData: FormData) {
+  const { supabase } = await requireParent();
+  const date = str(formData, "date");
+  const start = str(formData, "start");
+  const end = str(formData, "end");
+  if (!date || !start || !end) fail("/crew/team", "Enter the date, clock-in and clock-out times.");
+  const { error } = await supabase.rpc("add_shift", {
+    p_kid: kidId,
+    p_start: zonedToIso(date, start, tz),
+    p_end: zonedToIso(date, end, tz),
+    p_note: str(formData, "note") || null,
+  });
+  if (error) fail("/crew/team", error.message);
+  done("/crew/team");
+}
+
 export async function deleteShift(shiftId: string) {
   const { supabase } = await requireParent();
   const { error } = await supabase.from("shifts").delete().eq("id", shiftId);

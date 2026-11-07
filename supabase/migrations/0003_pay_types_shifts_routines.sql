@@ -106,6 +106,22 @@ begin
   if not found then raise exception 'Shift not found'; end if;
 end $$;
 
+-- Parent adds a shift that was never clocked (forgot to clock in)
+create or replace function public.add_shift(p_kid uuid, p_start timestamptz, p_end timestamptz, p_note text) returns void
+language plpgsql security definer set search_path = public as $$
+declare k profiles;
+begin
+  if not is_parent() then raise exception 'Parents only'; end if;
+  select * into k from profiles where id = p_kid and family_id = my_family_id();
+  if k.id is null then raise exception 'Crew member not found'; end if;
+  if k.hourly_rate is null then raise exception 'Set an hourly rate for this person first'; end if;
+  if p_end <= p_start then raise exception 'Clock-out must be after clock-in'; end if;
+  insert into shifts (family_id, kid_id, started_at, ended_at, rate, amount, note, edited_by)
+  values (k.family_id, k.id, p_start, p_end, k.hourly_rate,
+          round(extract(epoch from (p_end - p_start)) / 3600 * k.hourly_rate, 2),
+          coalesce(p_note, 'Added by parent'), auth.uid());
+end $$;
+
 -- ───────────── Routine check-off ─────────────
 -- Crew members can check off today or earlier days this week; parents can mark any day.
 create or replace function public.toggle_routine(p_routine uuid, p_date date) returns boolean

@@ -1,6 +1,6 @@
 import { SubmitButton } from "@/components/SubmitButton";
 import { money } from "@/lib/auth";
-import { addRoutine, deleteShift, fixShift, removeRoutine, updatePaySetup } from "../actions";
+import { addRoutine, addShift, deleteShift, fixShift, removeRoutine, updatePaySetup } from "../actions";
 import { DAY_NAMES, localDate, weekShifts, type Member, type Routine, type Shift } from "../data";
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7];
@@ -150,6 +150,25 @@ function Timesheet({ member, shifts, tz }: { member: Member; shifts: Shift[]; tz
           )}
         </div>
       ))}
+      <form action={addShift.bind(null, member.id, tz)} className="space-y-2 rounded-2xl border border-dashed border-sand p-3">
+        <p className="label mb-0">Add a missed shift</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <div className="col-span-2 sm:col-span-1">
+            <label className="label">Date</label>
+            <input name="date" type="date" defaultValue={localDate(tz)} className="input" required />
+          </div>
+          <div>
+            <label className="label">In</label>
+            <input name="start" type="time" defaultValue={member.shift_start?.slice(0, 5) ?? ""} className="input" required />
+          </div>
+          <div>
+            <label className="label">Out</label>
+            <input name="end" type="time" defaultValue={member.shift_end?.slice(0, 5) ?? ""} className="input" required />
+          </div>
+        </div>
+        <input name="note" placeholder="Note, e.g. Forgot to clock in" className="input" />
+        <SubmitButton className="btn-ghost w-full">Add shift</SubmitButton>
+      </form>
       <p className="text-xs text-stone-500">Pay weeks run Saturday to Friday, so Friday&apos;s shift is included in that Friday&apos;s pay. Times are Pacific.</p>
     </div>
   );
