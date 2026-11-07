@@ -78,6 +78,10 @@ export async function loadCrew() {
     supabase.from("routine_checks").select("*").gte("check_date", isoDaysAgo(45)),
   ]);
   const me = ((members.data ?? []) as Member[]).find((m) => m.id === profile.id);
+  // Database updates that haven't been run yet (shown to parents as a banner).
+  const pendingUpdates: string[] = [];
+  if (jobs.data?.length && !("photo_required" in (jobs.data[0] as object))) pendingUpdates.push("0002_required_photos.sql");
+  if (shifts.error || routines.error) pendingUpdates.push("0003_pay_types_shifts_routines.sql");
   return {
     supabase,
     profile: { ...profile, ...me } as typeof profile & Member,
@@ -91,6 +95,7 @@ export async function loadCrew() {
     shifts: (shifts.data ?? []) as Shift[],
     routines: (routines.data ?? []) as Routine[],
     checks: (checks.data ?? []) as RoutineCheck[],
+    pendingUpdates,
   };
 }
 

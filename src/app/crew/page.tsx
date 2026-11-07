@@ -1,3 +1,4 @@
+import { UpdateBanner } from "@/components/UpdateBanner";
 import { CrewHeader } from "@/components/CrewHeader";
 import { loadCrew } from "./data";
 import { KidView } from "./KidView";
@@ -7,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CrewPage({ searchParams }: { searchParams: Promise<{ error?: string; day?: string }> }) {
   const { error, day } = await searchParams;
-  const { supabase, profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, checks } =
+  const { supabase, profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, checks, pendingUpdates } =
     await loadCrew();
   const isParent = profile.role === "parent";
 
@@ -36,6 +37,7 @@ export default async function CrewPage({ searchParams }: { searchParams: Promise
         <h1 className={`${profile.position_title && !isParent ? "" : "mb-4"} text-3xl text-brand`}>Hi, {profile.display_name.split(" ")[0]} 👋</h1>
         {profile.position_title && !isParent && <p className="mb-4 text-sm text-stone-600">{profile.position_title}</p>}
         {error && <p className="mb-4 rounded-xl bg-rust/10 px-3 py-2 text-sm text-rust">{error}</p>}
+        {isParent && <div className="mb-4"><UpdateBanner files={pendingUpdates} /></div>}
         {isParent ? (
           <ParentView
             members={members}

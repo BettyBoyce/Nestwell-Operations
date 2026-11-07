@@ -1,3 +1,4 @@
+import { UpdateBanner } from "@/components/UpdateBanner";
 import Link from "next/link";
 import { CrewHeader } from "@/components/CrewHeader";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function TeamPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requireParent();
   const { error } = await searchParams;
-  const { profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines } = await loadCrew();
+  const { profile, familyName, timezone, members, jobs, time, payouts, notifications, shifts, routines, pendingUpdates } = await loadCrew();
   const kids = members.filter((m) => m.role === "kid");
   const nameOf = (id: string) => members.find((m) => m.id === id)?.display_name ?? "—";
 
@@ -21,6 +22,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-6">
         <h1 className="text-3xl text-brand">Team & Pay</h1>
         {error && <p className="rounded-xl bg-rust/10 px-3 py-2 text-sm text-rust">{error}</p>}
+        <UpdateBanner files={pendingUpdates} />
 
         <section className="card">
           <h2 className="text-xl text-brand">The crew</h2>
