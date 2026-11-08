@@ -102,3 +102,9 @@ Family life clips for About-page and social content.
 | `videos/park-slide-1.mp4`, `park-slide-2.mp4` | Slide rides at the park |
 | `videos/theme-park-main-street.mp4` | Theme park day |
 | `videos/car-ride-dancing.mp4` | Car-ride dancing |
+
+## Reels: `reels/`
+| File | What it is |
+|---|---|
+| `nestwell-insurance-housing-reel.mp4` | 25-second reel for Salem families displaced by insurance claims (save-this hook, end card with staynestwell.com) |
+| `nestwell-insurance-housing-reel-caption.txt` | Caption and hashtags for it |
