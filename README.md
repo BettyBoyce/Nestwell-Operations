@@ -12,7 +12,7 @@ The operations hub for [Nestwell Stays LLC](https://www.staynestwell.com), a fam
 | [Crew position descriptions](docs/positions/README.md) | Official roles for each crew member |
 | [Brand kit](public/brand/README.md) | Logo files, colors and fonts |
 | [Roadmap](docs/ROADMAP.md) | What's built and what's next |
-| [Website summary](docs/WEBSITE.md) | What staynestwell.com says: guests served, amenities, Nestwell Capital, fixes needed |
+| [Website summary](docs/WEBSITE.md) | What staynestwell.com says: guests served, amenities, fixes needed |
 
 ## Products
 
